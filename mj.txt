@@ -1,0 +1,876 @@
+1.Implement producer consumer synchronization using shared memory & semaphore.
+
+from multiprocessing import Process, Semaphore, Lock, Manager
+import time, random
+BUFFER_SIZE = 5
+def producer(buffer, empty, full, mutex):
+    for i in range(10):
+        item = random.randint(1, 100)
+        empty.acquire() 
+        with mutex:            
+            buffer.append(item)
+            print(f"Produced {item} | Buffer: {list(buffer)}")
+        full.release()       
+        time.sleep(0.3)
+
+def consumer(buffer, empty, full, mutex):
+    for i in range(10):
+        full.acquire()   
+        with mutex:
+            item = buffer.pop(0)
+            print(f"Consumed {item} | Buffer: {list(buffer)}")
+        empty.release()  
+        time.sleep(0.5)
+if __name__ == "__main__":
+    manager = Manager()
+    buffer = manager.list()                
+    empty = Semaphore(BUFFER_SIZE)         
+    full = Semaphore(0)                    
+    mutex = Lock()
+    p = Process(target=producer, args=(buffer, empty, full, mutex))
+    c = Process(target=consumer, args=(buffer, empty, full, mutex))
+    p.start(); c.start()
+    p.join(); c.join()
+
+2.Simulate FCFS Scheduling.
+def fcfs(processes):
+    n=len(processes)
+    processes.sort(key=lambda x:x[1])
+    CT=[0] * n
+    WT=[0] * n
+    TT=[0] * n
+    current_time= 0
+    for i in range(n):
+        pid, arrival, burst = processes[i]
+        if current_time < arrival:
+            current_time = arrival
+        CT[i]=current_time + burst
+        TT[i]=CT[i]-arrival
+        WT[i]=TT[i]-burst
+        current_time = CT[i]
+    print("PID\tArrival\tBurst\tCT\tTT\tWT.")
+    for i in range(n):
+        pid, arrival, burst=processes[i]
+        print(f"{pid}\t{arrival}\t{burst}\t{CT[i]}\t{TT[i]}\t{WT[i]}")
+process_list = [
+    (1,0,4),
+    (2,1,3),
+    (3,2,1),
+    (4,3,2)]
+fcfs(process_list)
+
+3.Analysis blocking v/s non-blocking communication.
+
+from multiprocessing import Process, Queue
+import time
+def blocking_sender(q):
+    print("[Blocking Sender] Sending message...")
+    q.put("Hello from sender")  
+    print("[Blocking Sender] Message sent.")
+def blocking_receiver(q):
+    print("[Blocking Receiver] Waiting for message...")
+    msg = q.get() 
+    print(f"[Blocking Receiver] Received:{msg}")
+def nonblocking_sender(q):
+    from queue import Full
+    try:
+        print("[Non-Blocking Sender] Trying to send message...")
+        q.put_nowait("Non-blocking message") 
+        print("[Non-Blocking Sender] Message sent.")
+    except Full:
+        print("[Non-Blocking Sender] Queue is full! Couldn't send message.")
+def nonblocking_receiver(q):
+    from queue import Empty
+    print("[Non-Blocking Receiver] Trying to get message...")
+    try:
+        msg = q.get_nowait()  
+        print(f"[Non-Blocking Receiver] Received: {msg}")
+    except Empty:
+        print("[Non-Blocking Receiver] Queue was empty!Moving on...")
+if __name__ == "__main__":
+    from multiprocessing import Queue
+    print("=== Blocking Communication ===")
+    q1 = Queue()
+    p1 = Process(target=blocking_receiver, args=(q1,))
+    p2 = Process(target=blocking_sender, args=(q1,))
+    p1.start()
+    p2.start()
+    p1.join()
+    p2.join()
+    print("\n=== Non-Blocking Communication ===")
+    q2 = Queue(maxsize=1)
+    nonblocking_receiver(q2)
+    nonblocking_sender(q2)
+    nonblocking_sender(q2)
+
+4.Implement multithreading to generating & print fibonnaci sequence.
+import threading
+def fibonacci(n, thread_name):
+    print(f"{thread_name} - fibonacci sequence up to {n} terms:")
+    a, b = 0, 1
+    for _ in range(n):
+        print(a, end=' ')
+        a, b = b, a + b
+    print("\n")
+t1 = threading.Thread(target=fibonacci, args=(10, "Thread-1"))
+t2 = threading.Thread(target=fibonacci, args=(15, "Thread-2"))
+t3 = threading.Thread(target=fibonacci, args=(20, "Thread-3"))
+t1.start()
+t2.start()
+t3.start()
+t1.join()
+t2.join()
+t3.join()
+print("All threads have completed.")
+
+5.Implement reader and writer priorlization.
+import threading, time, random
+rw_mutex = threading.Semaphore(1)  
+mutex = threading.Semaphore(1)  
+read_count = 0
+def reader(id):
+    global read_count
+    while True:
+        mutex.acquire()
+        read_count += 1
+        if read_count == 1:
+            rw_mutex.acquire() 
+        mutex.release()
+        print(f"Reader {id} reading")
+        time.sleep(random.uniform(0.2, 0.5))
+        mutex.acquire()
+        read_count -= 1
+        if read_count == 0:
+            rw_mutex.release()
+        mutex.release()
+        time.sleep(random.uniform(0.2, 0.5))
+def writer(id):
+    while True:
+        rw_mutex.acquire()
+        print(f"Writer {id} writing")
+        time.sleep(random.uniform(0.3, 0.6))
+        rw_mutex.release()
+        time.sleep(random.uniform(0.3, 0.6))
+for i in range(2): threading.Thread(target=reader, args=(i,)).start()
+for j in range(2): threading.Thread(target=writer, args=(j,)).start()
+
+6.Analysis waiting time, TT & Gantt Chart generation.
+
+FCFS: 
+def fcfs(processes):
+    processes.sort(key=lambda x: x[1])
+    n = len(processes)
+    ct, tt, wt = [0]*n, [0]*n, [0]*n
+    current_time = 0
+    gantt_chart = []
+    for i in range(n):
+        pid, arrival, burst = processes[i]
+        start_time = max(current_time, arrival)
+        completion_time = start_time + burst
+        gantt_chart.append((f"P{pid}", start_time, completion_time))
+        ct[i] = completion_time
+        tt[i] = ct[i] - arrival
+        wt[i] = tt[i] - burst
+        current_time = completion_time
+    print("PID\tAT\tBT\tCT\tTT\tWT")
+    for i in range(n):
+        pid, arrival, burst = processes[i]
+        print(f"{pid}\t{arrival}\t{burst}\t{ct[i]}\t{tt[i]}\t{wt[i]}")
+    print("\n--- Gantt Chart ---")
+    chart_string = ""
+    time_string = ""
+    for process, start, end in gantt_chart:
+        chart_string += f"|  {process}  "
+        time_string += f"{start}      "
+    chart_string += "|"
+    time_string += f"{gantt_chart[-1][2]}"
+    print(chart_string)
+    print(time_string)
+processes = [(1, 0, 8), (2, 1, 4), (3, 2, 9), (4, 3, 5)]
+fcfs(processes)
+
+SJF:
+def sjf(processes):
+    processes.sort(key=lambda x: x[1]) 
+    n = len(processes)
+    ct, tt, wt = [0]*n, [0]*n, [0]*n
+    completed = [False] * n
+    current_time = 0
+    gantt_chart = []
+    for _ in range(n):
+        available_jobs = [i for i in range(n) if not completed[i] and processes[i][1] <= current_time]   
+        if not available_jobs:
+            current_time += 1
+            continue
+        sjf_index = min(available_jobs, key=lambda i: processes[i][2])
+        pid, arrival, burst = processes[sjf_index]
+        start_time = current_time
+        completion_time = start_time + burst
+        gantt_chart.append((f"P{pid}", start_time, completion_time))
+        ct[sjf_index] = completion_time
+        tt[sjf_index] = ct[sjf_index] - arrival
+        wt[sjf_index] = tt[sjf_index] - burst
+        current_time = completion_time
+        completed[sjf_index] = True
+    print("PID\tAT\tBT\tCT\tTT\tWT")
+    for i in range(n):
+        pid, arrival, burst = processes[i]
+        print(f"{pid}\t{arrival}\t{burst}\t{ct[i]}\t{tt[i]}\t{wt[i]}")
+    print("\n--- Gantt Chart ---")
+    chart_string = ""
+    time_string = ""
+    for process, start, end in gantt_chart:
+        chart_string += f"|  {process}  "
+        time_string += f"{start}      "
+    chart_string += "|"
+    time_string += f"{gantt_chart[-1][2]}"
+    print(chart_string)
+    print(time_string)
+processes = [(1, 0, 7), (2, 2, 4), (3, 4, 1), (4, 5, 4)]
+sjf(processes)
+
+Priority: 
+def priority_scheduling(processes):
+    processes.sort(key=lambda x: (x[1], x[3])) 
+    n = len(processes)
+    ct, tt, wt = [0]*n, [0]*n, [0]*n
+    completed = [False] * n
+    current_time = 0
+    gantt_chart = []
+    for _ in range(n):
+        available_jobs = [i for i in range(n) if not completed[i] and processes[i][1] <= current_time]   
+        if not available_jobs:
+            current_time += 1
+            continue
+        highest_priority_index = min(available_jobs, key=lambda i: processes[i][3])
+        pid, arrival, burst, priority = processes[highest_priority_index]
+        start_time = current_time
+        completion_time = start_time + burst       
+        gantt_chart.append((f"P{pid}", start_time, completion_time))
+        ct[highest_priority_index] = completion_time
+        tt[highest_priority_index] = ct[highest_priority_index] - arrival
+        wt[highest_priority_index] = tt[highest_priority_index] - burst
+        current_time = completion_time
+        completed[highest_priority_index] = True
+    print("PID\tAT\tBT\tPriority\tCT\tTT\tWT")
+    for i in range(n):
+        pid, arrival, burst, priority = processes[i]
+        print(f"{pid}\t{arrival}\t{burst}\t{priority}\t\t{ct[i]}\t{tt[i]}\t{wt[i]}")
+    print("\n--- Gantt Chart ---")
+    chart_string = ""
+    time_string = ""
+    for process, start, end in gantt_chart:
+        chart_string += f"|  {process}  "
+        time_string += f"{start}      "
+    chart_string += "|"
+    time_string += f"{gantt_chart[-1][2]}"
+    print(chart_string)
+    print(time_string)
+processes = [(1, 0, 4, 2), (2, 1, 3, 1), (3, 2, 1, 3), (4, 3, 2, 4)]
+priority_scheduling(processes)
+
+Implement for all : 
+def non_preemptive_scheduling(processes, scheduling='FCFS'):
+    """
+    Simulate non-preemptive scheduling algorithms with analysis and Gantt chart.
+    Args:
+        processes: List of tuples (pid, arrival_time, burst_time, priority)
+        scheduling: 'FCFS', 'SJF', or 'Priority'
+    """
+    n = len(processes)
+    completed = [False] * n
+    completion_time = [0] * n
+    waiting_time = [0] * n
+    turnaround_time = [0] * n
+    current_time = 0
+    completed_count = 0
+    gantt_chart = []
+    while completed_count < n:
+        ready_queue = [i for i in range(n) if (processes[i][1] <= current_time and not completed[i])]
+        if not ready_queue:
+            next_arrival = min([processes[i][1] for i in range(n) if not completed[i]])
+            gantt_chart.append(('Idle', current_time, next_arrival))
+            current_time = next_arrival
+            continue
+        if scheduling == 'FCFS':
+            idx = min(ready_queue, key=lambda i: processes[i][1])
+        elif scheduling == 'SJF':
+            idx = min(ready_queue, key=lambda i: processes[i][2])
+        elif scheduling == 'Priority':
+            idx = min(ready_queue, key=lambda i: processes[i][3])
+        else:
+            raise ValueError("Unsupported scheduling algorithm.")
+        pid, arrival, burst, priority = processes[idx]
+        start_time = current_time
+        finish_time = start_time + burst
+        completion_time[idx] = finish_time
+        turnaround_time[idx] = finish_time - arrival
+        waiting_time[idx] = start_time - arrival
+
+        current_time = finish_time
+        completed[idx] = True
+        completed_count += 1
+        gantt_chart.append((pid, start_time, finish_time))
+    print(f"\n{scheduling} Scheduling:")
+    print("PID\tAT\tBT\tPriority\tCT\tTT\tWT")
+    for i in range(n):
+        pid, arrival, burst, priority = processes[i]
+print(f"{pid}\t{arrival}\t{burst}\t{priority}\t\t{completion_time[i]}\t{turnaround_time[i]}\t{waiting_time[i]}")
+    avg_wt = sum(waiting_time) / n
+    avg_tt = sum(turnaround_time) / n
+    print(f"\nAverage Waiting Time: {avg_wt:.2f}")
+    print(f"Average Turnaround Time: {avg_tt:.2f}")
+    print("\nGantt Chart:")
+    block_line = ""
+    time_line = ""
+    for pid, start, end in gantt_chart:
+        block = f"|  {'Idle' if pid == 'Idle' else 'P'+str(pid)}  "
+        time = f"{start:<6}"
+        block_line += block
+        time_line += time
+    block_line += "|"
+    time_line += f"{gantt_chart[-1][2]}"
+    print(block_line)
+    print(time_line)
+process_list = [
+    (1, 0, 4, 2),
+    (2, 1, 3, 1),
+    (3, 2, 1, 3),
+    (4, 3, 2, 2)
+]
+non_preemptive_scheduling(process_list, scheduling='FCFS')
+non_preemptive_scheduling(process_list, scheduling='SJF')
+non_preemptive_scheduling(process_list, scheduling='Priority')
+
+7.Practice the thread creation & basic thread life cycle using standard.
+import threading, time
+def worker(thread_id):
+    print(f"Thread{thread_id}starting")
+    time.sleep(2)
+    print(f"Thread{thread_id}finished")
+def main():
+    print("Main thread starting")
+    threads = []
+    for i in range(3):
+        t = threading.Thread(target=worker, args=(i,))
+        threads.append(t)
+        t.start()
+        print(f"Thread {i} has been started")
+    for i, t in enumerate(threads):
+        t.join()
+        print(f"Thread {i} has completed")
+    print("Main thread finished")
+if __name__ == "__main__":
+    main()
+
+8.simulate producer consumer bounded buffer using mutex & semaphore
+import threading, time, random
+from collections import deque
+buffer = deque()
+BUFFER_SIZE = 2
+mutex = threading.Semaphore(1)
+empty = threading.Semaphore(BUFFER_SIZE)
+full = threading.Semaphore(0)
+def producer(pid, items=5):
+    for i in range(items):
+        empty.acquire()
+        mutex.acquire()
+        buffer.append((pid, i))
+        print(f"Producer-{pid} produced Item-{i}, Buffer size: {len(buffer)}")
+        mutex.release()
+        full.release()
+        time.sleep(random.uniform(0.1, 0.3))
+def consumer(cid, items=5):
+    for i in range(items):
+        full.acquire()
+        mutex.acquire()
+        p, item = buffer.popleft()
+        print(f"Consumer-{cid} consumed item-{item} from Producer-{p}. Buffer size: {len(buffer)}")
+        mutex.release()
+        empty.release()
+        time.sleep(random.uniform(0.1, 0.3))
+if __name__ == "__main__":
+    p1 = threading.Thread(target=producer, args=(1, 5))
+    p2 = threading.Thread(target=producer, args=(2, 5))
+    c1 = threading.Thread(target=consumer, args=(1, 5))
+    c2 = threading.Thread(target=consumer, args=(2, 5))
+    for t in [p1, p2, c1, c2]: t.start()
+    for t in [p1, p2, c1, c2]: t.join()
+    print("\nAll producers and consumers have finished.")
+
+Module 2
+1.Construct a dynamic singly linked list with basic operation.
+class Node:
+    def __init__(self, data):
+        self.data= data
+        self.next = None 
+class SinglyLinkedList:
+    def __init__(self):
+        self.head=None
+    def insert_end(self, data):
+        new = Node(data)
+        if self.head is None:
+            self.head=new;
+            return
+        temp=self.head
+        while temp.next:
+            temp=temp.next
+        temp.next=new
+    def display(self):
+        temp=self.head
+        while temp: print(temp.data,end="->"); temp=temp.next
+        print("None")
+    def search(self, key):
+        temp=self.head
+        while temp:
+            if temp.data==key: return True
+            temp=temp.next
+        return False
+    def delete(self,key):
+        temp=self.head; prev=None
+        while temp and temp.data!=key:
+            prev,temp=temp,temp.next
+        if not temp: print(f"{key} not found in list."); return
+        if not prev: self.head=temp.next
+        else: prev.next=temp.next
+
+ll=SinglyLinkedList()
+for x in [5,10,20]: ll.insert_end(x)
+ll.display()
+print("Search 10:",ll.search(10))
+print("Seacrh 99:",ll.search(99))
+ll.delete(10); ll.display()
+ll.delete(100)
+
+2.Develop linear and circular queue to simulate task scheduling.
+Linear Queue: 
+class Linear:
+    def __init__(self,size):
+        self.queue=[]
+        self.max_size=size
+    def enqueue(self,task):
+        if len(self.queue)==self.max_size:
+            print("Queue Overflow - Task cannot be added")
+        else: self.queue.append(task)
+    def dequeue(self):
+        if not self.queue:
+            print("Queue underflow - No task to process.")
+        else:
+            task=self.queue.pop(0)
+            print(f"Processing task: {task}")
+    def display(self):
+        print("Current Queue:", self.queue)
+print("--Linear Queu--")
+lq=Linear(5)
+lq.enqueue("Task A")
+lq.enqueue("Task B")
+lq.enqueue("Task C")
+lq.display()
+lq.dequeue()
+lq.display()
+
+circular Queue:
+class CircularQueue:
+    def __init__(self, size):
+        self.size = size
+        self.queue = [None] * size
+        self.front = -1
+        self.rear = -1
+    def enqueue(self, task):
+        if (self.rear + 1) % self.size == self.front:
+            print("Queue Overflow - Task cannot be added.")
+            return
+        if self.front == -1:
+            self.front = 0       
+        self.rear = (self.rear + 1) % self.size
+        self.queue[self.rear] = task
+    def dequeue(self):
+        if self.front == -1:
+            print("Queue Underflow - No task to process.")
+            return
+
+        task = self.queue[self.front]
+        print(f"Processing task:{task}")        
+        if self.front == self.rear:
+            self.front = -1
+            self.rear = -1
+        else:
+            self.front = (self.front + 1) % self.size
+    def display(self):
+        if self.front == -1:
+            print("Queue is empty.")
+            return
+        print("Current Queue:", end="")      
+        i = self.front
+        while True:
+            print(f" {self.queue[i]}", end="")
+            if i == self.rear:
+                break
+            i = (i + 1) % self.size
+        print()
+print("--- Circular Queue ---")
+cq = CircularQueue(5)
+cq.enqueue("Task X")
+cq.enqueue("Task Y")
+cq.enqueue("Task Z")
+cq.display()
+cq.dequeue()
+cq.dequeue()
+cq.display()
+cq.enqueue("Task W")
+cq.enqueue("Task V")
+cq.enqueue("Task U")
+cq.display()
+
+3.Representation polynomial using linked list.
+class Term:
+    def __init__(self, coeff, power):
+        self.coeff = coeff
+        self.power = power
+        self.next = None
+def insert(head, coeff, power):
+    new = Term(coeff, power)
+    if not head:
+        return new
+    temp = head
+    while temp.next:
+        temp = temp.next
+    temp.next = new
+    return head
+def display(head):
+    res = ""
+    while head:
+        if head.coeff >= 0 and res != "":
+            res += f"+{head.coeff}x^{head.power}"
+        else:
+            res += f"{head.coeff}x^{head.power}"
+        head = head.next
+    print(res)
+def add(p1, p2):
+    result = None
+    while p1 or p2:
+        if p1 and (not p2 or p1.power > p2.power):
+            result = insert(result, p1.coeff, p1.power)
+            p1 = p1.next
+        elif p2 and (not p1 or p2.power > p1.power):
+            result = insert(result, p2.coeff, p2.power)
+            p2 = p2.next
+        else:
+            result = insert(result, p1.coeff + p2.coeff, p1.power)
+            p1, p2 = p1.next, p2.next
+    return result
+p1 = None
+p1 = insert(p1, 3, 4)
+p1 = insert(p1, 2, 3)
+p2 = None
+p2 = insert(p2, 4, 3)
+p2 = insert(p2, -2, 1)
+print("Polynomial 1:", end=" ")
+display(p1)
+print("Polynomial 2:", end=" ")
+display(p2)
+sum_poly = add(p1, p2)
+print("Sum:", end=" ")
+display(sum_poly)
+
+4.Implement push, pop, peek using array or linked list.
+class Stack:
+    def __init__(self):
+        self.stack = []
+    def push(self, item):
+        self.stack.append(item)
+    def pop(self):
+        if self.is_empty():
+            return "Stack underflow"
+        return self.stack.pop()
+    def peek(self):
+        if self.is_empty():
+            return "stack is empty"
+        return self.stack[-1]
+    def is_empty(self):
+        return len(self.stack) == 0
+    def display(self):
+        print("Stack (top to bottom):", self.stack[::-1])
+s = Stack()
+s.push(10)
+s.push(20)
+s.push(30)
+s.display()
+print("Top Element:", s.peek())
+print("Popped:", s.pop())
+s.display()
+
+5.Create a doubly linked list with forward & backward traversal.
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.prev = None
+        self.next = None
+class DoublyLinkedList:
+    def __init__(self):
+        self.head = None
+    def append(self, data):
+        new_node = Node(data)
+        if not self.head:  
+            self.head = new_node
+            return
+        temp = self.head
+        while temp.next:        
+            temp = temp.next
+        temp.next = new_node
+        new_node.prev = temp
+    def forward_traversal(self):
+        temp = self.head
+        while temp:
+            print(temp.data, end=" ")
+            last = temp
+            temp = temp.next
+        print()
+        return last
+    def backward_traversal(self, last):
+        temp = last
+        while temp:
+            print(temp.data, end=" ")
+            temp = temp.prev
+        print()
+dll = DoublyLinkedList()
+for val in [10, 20, 30, 40]:
+    dll.append(val)
+print("Forward Traversal:")
+last = dll.forward_traversal()
+print("Backward Traversal:")
+dll.backward_traversal(last)
+
+6.Represent graph using adjacency matrix & list.
+Matrix:
+class GraphMatrix:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = [[0] * vertices for _ in range(vertices)]
+    def add_edge(self, src, dest):
+        self.graph[src][dest] = 1
+        self.graph[dest][src] = 1
+    def display(self):
+        print("Adjacency Matrix:")
+        for row in self.graph:
+            print(row)
+    def dfs(self, start, visited=None):
+        if visited is None:
+            visited = [False] * self.V      
+        visited[start] = True
+        print(start, end=' ')
+        for i in range(self.V):
+            if self.graph[start][i] == 1 and not visited[i]:
+                self.dfs(i, visited)
+    def bfs(self, start):
+        visited = [False] * self.V
+        queue = [start]
+        visited[start] = True  
+        while queue:
+            v = queue.pop(0)
+            print(v, end=' ')            
+            for i in range(self.V):
+                if self.graph[v][i] == 1 and not visited[i]:
+                    visited[i] = True
+                    queue.append(i)
+if __name__ == "__main__":
+    gm = GraphMatrix(5)
+    gm.add_edge(0, 1)
+    gm.add_edge(0, 2)
+    gm.add_edge(1, 3)
+    gm.add_edge(1, 4)
+    gm.display()
+    print("\nDFS traversal from vertex 0:")
+    gm.dfs(0)
+    print("\n\nBFS traversal from vertex 0:")
+
+for list:
+from collections import defaultdict, deque
+class GraphList:
+    def __init__(self):
+        self.graph = defaultdict(list)
+    def add_edge(self, src, dest):
+        self.graph[src].append(dest)
+        self.graph[dest].append(src) 
+    def display(self):
+        print("Adjacency List:")
+        for key in self.graph:
+            print(f"{key} -> {self.graph[key]}")
+    def dfs(self, start, visited=None):
+        if visited is None:
+            visited = set()   
+        visited.add(start)
+        print(start, end=' ') 
+        for neighbor in self.graph[start]:
+            if neighbor not in visited:
+                self.dfs(neighbor, visited)
+    def bfs(self, start):
+        visited = set()
+        queue = deque([start])
+        visited.add(start) 
+        while queue:
+            v = queue.popleft()
+            print(v, end=' ') 
+            for neighbor in self.graph[v]:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+if __name__ == "__main__":
+    from collections import defaultdict, deque
+    gl = GraphList()
+    edges = [(0, 1), (0, 2), (1, 3), (1, 4)]
+    for u, v in edges:
+        gl.add_edge(u, v)
+    gl.display()
+    print("\nDFS traversal from vertex 0:")
+    gl.dfs(0)
+    print("\n\nBFS traversal from vertex 0:")
+    gl.bfs(0)
+    print()
+
+for all: 
+class GraphMatrix:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = [[0] * vertices for _ in range(vertices)]
+    def add_edge(self, src, dest):
+        self.graph[src][dest] = 1
+        self.graph[dest][src] = 1
+    def display(self):
+        print("Adjacency Matrix:")
+        for row in self.graph:
+            print(row)
+    def dfs(self, start, visited=None):
+        if visited is None:
+            visited = [False] * self.V
+        
+        visited[start] = True
+        print(start, end=' ')     
+        for i in range(self.V):
+            if self.graph[start][i] == 1 and not visited[i]:
+                self.dfs(i, visited)
+    def bfs(self, start):
+        visited = [False] * self.V
+        queue = [start]
+        visited[start] = True        
+        while queue:
+            v = queue.pop(0)
+            print(v, end=' ')            
+            for i in range(self.V):
+                if self.graph[v][i] == 1 and not visited[i]:
+                    visited[i] = True
+                    queue.append(i)
+class GraphList:
+    def __init__(self):
+        self.graph = defaultdict(list)
+
+    def add_edge(self, src, dest):
+        self.graph[src].append(dest)
+        self.graph[dest].append(src)
+    def display(self):
+        print("Adjacency List:")
+        for key in self.graph:
+            print(f"{key} -> {self.graph[key]}")
+    def dfs(self, start, visited=None):
+        if visited is None:
+            visited = set()
+        visited.add(start)
+        print(start, end=' ')
+        for neighbor in self.graph[start]:
+            if neighbor not in visited:
+                self.dfs(neighbor, visited)
+    def bfs(self, start):
+        visited = set()
+        queue = deque([start])
+        visited.add(start) 
+        while queue:
+            v = queue.popleft()
+            print(v, end=' ')
+            for neighbor in self.graph[v]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+                    visited.add(neighbor)
+if __name__ == "__main__":
+    from collections import defaultdict, deque
+    edges = [(0, 1), (0, 2), (1, 3), (1, 4)]
+    print("=== Using Adjacency Matrix ===")
+    gm = GraphMatrix(5)
+    for u, v in edges:
+        gm.add_edge(u, v)
+    gm.display()
+    print("\nDFS from 0:", end=' ')
+    gm.dfs(0)
+    print("\n\nBFS from 0:", end=' ')
+    gm.bfs(0)
+    print("\n\n=== Using Adjacency List ===")
+    gl = GraphList()
+    for u, v in edges:
+        gl.add_edge(u, v)
+    gl.display()
+    print("\nDFS from 0:", end=' ')
+    gl.dfs(0)
+    print("\n\nBFS from 0:", end=' ')
+    gl.bfs(0)
+    print()
+    gm.bfs(0)
+    print()
+
+7.Create a binary search tree from data set.
+class Node:
+    def __init__(self, key):
+        self.left = None
+        self.right = None
+        self.val = key
+def insert(root, key):
+    if root is None:
+        return Node(key)
+    if key < root.val:
+        root.left = insert(root.left, key)
+    else:
+        root.right = insert(root.right, key)
+    return root
+def inorder(root):
+    if root:
+        inorder(root.left)
+        print(root.val, end=" ")
+        inorder(root.right)
+def preorder(root):
+    if root:
+        print(root.val, end=" ")
+        preorder(root.left)
+        preorder(root.right)
+def postorder(root):
+    if root:
+        postorder(root.left)
+        postorder(root.right)
+        print(root.val, end=" ")
+keys = [50, 30, 20, 40, 70, 60, 80]
+root = None
+for key in keys:
+    root = insert(root, key)
+print("In-order Traversal:")
+inorder(root)
+print("\nPre-order Traversal:")
+preorder(root)
+print("\nPost-order Traversal:")
+postorder(root)
+
+8.Create and manipulate structure to model ADT like student, book, employee. 
+class Student:
+    def __init__(self, name, roll):
+        self.name, self.roll = name, roll
+    def display(self):
+        print(f"Student: {self.name}, Roll: {self.roll}")
+class Book:
+    def __init__(self, title, author):
+        self.title, self.author = title, author
+    def display(self):
+        print(f"Book: {self.title}, Author: {self.author}")
+class Employee:
+    def __init__(self, name, eid):
+        self.name, self.eid = name, eid
+    def display(self):
+        print(f"Employee: {self.name}, ID: {self.eid}")
+s = Student("Alice", 101); s.display()
+b = Book("Python Basics", "John"); b.display()
+e = Employee("Bob", 1001); e.display()

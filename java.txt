@@ -1,0 +1,217 @@
+Practical No 4.
+Input: 
+class Bank {
+    int balance = 0;
+    boolean deposited = false;
+    synchronized void withdraw(int amount) {
+        if (!deposited) {
+            System.out.println("Insufficient balance. Waiting for deposit..");
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println(e);
+            }
+        }
+        balance -= amount;
+        System.out.println("Withdrawn: " + amount);
+    }
+    synchronized void deposit(int amount) {
+        balance += amount;
+        System.out.println("Deposited: " + amount);
+        deposited = true;
+        notify(); // Notify waiting thread
+    }
+}
+public class BankApp {
+    public static void main(String[] args) {
+        Bank b = new Bank();
+        Thread t1 = new Thread(() -> b.withdraw(500));
+        Thread t2 = new Thread(() -> b.deposit(1000));
+
+        t1.start(); // Start withdraw first (will wait)
+        try {
+            Thread.sleep(100); // Delay to ensure t1 runs first
+        } catch (InterruptedException e) {}
+        t2.start(); // Deposit after short delay
+    }
+}
+
+
+Practical No 5.
+A. Write a Java Program to implement the calculator.
+
+Input:
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+public class Calculator extends JFrame implements ActionListener {
+    JTextField display = new JTextField();
+    double num1 = 0, num2 = 0;
+    String op = "";
+    public Calculator() {
+        setLayout(new BorderLayout());
+        display.setEditable(false);
+        add(display, BorderLayout.NORTH);
+        JPanel panel = new JPanel(new GridLayout(5, 4));
+        String[] btns = {
+            "0", "1", "2", "3",
+            "4", "5", "6", "7",
+            "8", "9", "+", "-",
+            "*", "/", "=", "C"
+        };
+        for (String b : btns) {
+            JButton btn = new JButton(b);
+            btn.addActionListener(this);
+            panel.add(btn);
+        }
+        add(panel);
+        setTitle("Calculator");
+        setSize(250, 300);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(true);
+    }
+    public void actionPerformed(ActionEvent e) {
+        String cmd = e.getActionCommand();
+        if (cmd.matches("\\d")) {
+            display.setText(display.getText() + cmd);
+        } else if ("+-*/".contains(cmd)) {
+            num1 = Double.parseDouble(display.getText());
+            op = cmd;
+            display.setText("");
+        } else if (cmd.equals("=")) {
+            num2 = Double.parseDouble(display.getText());
+            double result = switch (op) {
+                case "+" -> num1 + num2;
+                case "-" -> num1 - num2;
+                case "*" -> num1 * num2;
+                case "/" -> num2 != 0 ? num1 / num2 : 0;
+                default -> 0;
+            };
+            display.setText(String.valueOf(result));
+        } else if (cmd.equals("C")) {
+            display.setText("");
+            num1 = num2 = 0;
+            op = "";
+        }
+    }
+    public static void main(String[] args) {
+        new Calculator();
+    }
+}
+
+B). to create a BioData
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+public class BiodataForm extends JFrame implements ActionListener {
+    JTextField nameField, addressField;
+    JRadioButton male, female;
+    JCheckBox btech, bsc, bcom;
+    JButton show;
+    public BiodataForm() {
+        setTitle("Enter Biodata");
+        setSize(400, 400);
+        setLayout(null);
+        JLabel nameLabel = new JLabel("Name");
+        nameLabel.setBounds(30, 30, 100, 20);
+        add(nameLabel);
+        nameField = new JTextField();
+        nameField.setBounds(150, 30, 200, 20);
+        add(nameField);
+        JLabel genderLabel = new JLabel("Gender");
+        genderLabel.setBounds(30, 60, 100, 20);
+        add(genderLabel);
+        male = new JRadioButton("Male");
+        male.setBounds(150, 60, 70, 20);
+        female = new JRadioButton("Female");
+        female.setBounds(230, 60, 80, 20);
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(male);
+        bg.add(female);
+        add(male); add(female);
+        JLabel qualLabel = new JLabel("Qualification");
+        qualLabel.setBounds(30, 100, 100, 20);
+        add(qualLabel);
+        btech = new JCheckBox("BTech");
+        btech.setBounds(150, 100, 70, 20);
+        bsc = new JCheckBox("BSc Cs");
+        bsc.setBounds(220, 100, 70, 20);
+        bcom = new JCheckBox("BCom");
+        bcom.setBounds(300, 100, 70, 20);
+        add(btech); add(bsc); add(bcom);
+        JLabel addrLabel = new JLabel("Address");
+        addrLabel.setBounds(30, 140, 100, 20);
+        add(addrLabel);
+        addressField = new JTextField();
+        addressField.setBounds(150, 140, 200, 20);
+        add(addressField);
+        show = new JButton("Show");
+        show.setBounds(150, 180, 100, 30);
+        show.addActionListener(this);
+        add(show);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(true);
+    }
+    public void actionPerformed(ActionEvent e) {
+        String name = nameField.getText();
+        String gender = male.isSelected() ? "Male" : (female.isSelected() ? "Female" : "");
+        String qual = "";
+        if (btech.isSelected()) qual += "BTech ";
+        if (bsc.isSelected()) qual += "BSc Cs ";
+        if (bcom.isSelected()) qual += "BCom ";
+        String addr = addressField.getText();
+        JOptionPane.showMessageDialog(this,
+            "Name: " + name + "\nGender: " + gender + "\nQualification: " + qual + "\nAddress: " + addr);
+    }
+    public static void main(String[] args) {
+        new BiodataForm();
+    }
+}
+
+Practical 7:
+
+import java.sql.*;
+public class DisplayTable {
+ public static void main(String[] args){
+     String url="jdbc:mysql://localhost:3306/student";
+     String user="root";
+     String password="root";
+     try{
+         Class.forName("com.mysql.cj.jdbc.Driver");
+         Connection conn =DriverManager.getConnection(url, user, password);
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT * FROM students");
+         System.out.println("ID\tName\tCourse");
+         while(rs.next()){
+             System.out.println(rs.getInt("id")+ "\t" + rs.getString("name") + "\t" + rs.getString("course"));         
+         }
+         rs.close();
+         stmt.close();
+         conn.close();
+     }
+     catch(Exception e){
+         e.printStackTrace();
+     }           
+ }   
+}
+
+Practical 9:
+input: 
+ import org.json.JSONObject;
+public class JsonExample {
+    public static void main(String[] args) {
+        JSONObject person = new JSONObject();
+        person.put("name", "Alice");
+        person.put("age", 25);
+        person.put("email", "alice@example.com");
+        System.out.println("JSON Data:");
+        System.out.println(person.toString(2));  
+        String jsonString = "{\"name\":\"Bob\", \"age\":30, \"email\":\"bob@example.com\"}";
+        JSONObject parsedPerson = new JSONObject(jsonString);
+        System.out.println("\nParsed JSON:");
+        System.out.println("Name: " + parsedPerson.getString("name"));
+        System.out.println("Age: " + parsedPerson.getInt("age"));
+        System.out.println("Email: " + parsedPerson.getString("email"));
+    }
+}
