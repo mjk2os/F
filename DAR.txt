@@ -1,0 +1,701 @@
+Practical No. 1
+
+Example 1: Load a CSV File
+Save your file as data.csv (in your working directory).
+
+setwd("C:/Users/Student/Documents/SYCS")  # change path accordingly
+mydata <- read.csv("data.csv")
+head(mydata)
+str(mydata) 
+summary(mydata)   
+
+Example 2: Load an Excel File
+If your file is .xlsx, install and use the readxl package.
+Type in Terminal :
+install.packages("readxl")
+library(readxl)
+myexceldata <- read_excel("data1.xlsx")
+head(myexceldata)
+
+
+Practical No. 2
+
+Aim: Creating datasets from raw data (text files, CSV files, Excel sheets) and importing data into R
+
+🪜 Procedure
+🔹 Step 1: Create and Save Raw Data Files
+(a) Text File (data.txt)
+Create a simple text file using Notepad with the following data:
+Name Age Marks
+Asha 20 85
+Ravi 21 90
+Neha 19 88
+Kiran 22 76
+Save it as data.txt in your working directory (e.g., C:/Users/Student/Documents/SYCS).
+
+(b) CSV File (data.csv)
+You can create a CSV in Excel or Notepad:
+If using Excel:
+Name
+Age
+Marks
+Asha
+20
+85
+Ravi
+21
+90
+Neha
+19
+88
+Kiran
+22
+76
+
+Save as → CSV (Comma delimited) (*.csv)
+→ Save it as data.csv in your working folder.
+
+(c) Excel File (data.xlsx)
+If you already have Excel:
+Create the same table in Excel.
+Save as → Excel Workbook (.xlsx)
+Name it data.xlsx.
+
+🔹 Step 2: Import Data into R
+(a) Import Text File
+# Set working directory
+setwd("C:/Users/Student/Documents/SYCS")
+
+# Import text file (space-separated)
+mydata_txt <- read.table("data.txt", header = TRUE)
+
+# View data
+head(mydata_txt)
+
+(b) Import CSV File
+mydata_csv <- read.csv("data.csv", header = TRUE)
+head(mydata_csv)
+
+(c) Import Excel File
+install.packages("readxl")
+library(readxl)
+
+# Read Excel file
+mydata_excel <- read_excel("data.xlsx")
+
+head(mydata_excel)
+
+🔹 Step 3: View and Explore Data
+
+View(mydata_csv)      # opens spreadsheet view
+summary(mydata_csv)   # statistical summary
+str(mydata_csv)       # structure of dataset
+
+
+Practical No. 3
+
+Aim: Exploring Data: Displaying Datasets using View() or print() in R
+
+data(iris)
+print(head(iris))
+print(iris)
+View(iris)
+
+Load and Explore Your Own CSV File (optional):
+
+setwd("C:/Users/Student/Documents/SYCS")
+mydata <- read.csv("data.csv")
+print(mydata)
+View(mydata)
+
+
+Practical No. 4
+
+Aim: Applying Conditional Filters using subset() or filter() in R
+
+🔹 Step 1: Create or Load a Dataset
+students <- data.frame(
+  Name = c("Asha", "Ravi", "Neha", "Kiran", "Meena", "Raj"),
+  Age = c(20, 21, 19, 22, 20, 23),
+  Marks = c(85, 90, 88, 76, 92, 67),
+  Gender = c("F", "M", "F", "M", "F", "M")
+)
+print(students)
+
+🔹 Step 2: Apply Filters using subset() (Base R)
+
+high_marks <- subset(students, Marks > 80)
+print(high_marks)
+female_students <- subset(students, Gender == "F")
+print(female_students)
+filtered_data <- subset(students, Age > 20 & Marks > 80)
+print(filtered_data)
+
+🔹 Step 3: Apply Filters using filter() (from dplyr)
+
+install.packages("dplyr")
+library(dplyr)
+high_marks_dplyr <- filter(students, Marks > 80)
+print(high_marks_dplyr)
+male_low_marks <- filter(students, Gender == "M", Marks < 80)
+print(male_low_marks)
+
+🔹 Step 4: Combining Conditions
+
+age_range <- filter(students, Age >= 20 & Age <= 22)
+print(age_range)
+filter(students, Gender == "F" | Marks > 90)
+
+
+Practical No. 5
+
+Aim: Sorting Data using arrange() in R
+
+students <- data.frame(
+  Name = c("Asha", "Ravi", "Neha", "Kiran", "Meena", "Raj"),
+  Age = c(20, 21, 19, 22, 20, 23),
+  Marks = c(85, 90, 88, 76, 92, 67),
+  Gender = c("F", "M", "F", "M", "F", "M")
+)
+print(students)
+
+🔹 Step 2: Load dplyr Library
+install.packages("dplyr")
+library(dplyr)
+
+🔹 Step 3: Sort Data in Ascending Order
+students_asc <- arrange(students, Marks)
+print(students_asc)
+
+🔹 Step 4: Sort Data in Descending Order
+students_desc <- arrange(students, desc(Marks))
+print(students_desc)
+
+🔹 Step 5: Sort by Multiple Columns
+multi_sort <- arrange(students, Age, desc(Marks))
+print(multi_sort)
+
+
+Practical No. 6
+
+Aim: Combining and Appending Datasets using merge() or bind_rows() in R
+
+students1 <- data.frame(
+  ID = c(1, 2, 3, 4),
+  Name = c("Asha", "Ravi", "Neha", "Kiran"),
+  Marks = c(85, 90, 88, 76)
+)
+
+students2 <- data.frame(
+  ID = c(3, 4, 5, 6),
+  Name = c("Neha", "Kiran", "Meena", "Raj"),
+  Marks = c(88, 76, 92, 67)
+)
+
+print(students1)
+print(students2)
+
+🔹 Step 2: Combine Datasets using merge() (Base R)
+(a) Inner Join (only matching IDs)
+merged_inner <- merge(students1, students2, by = "ID")
+print(merged_inner)
+
+(b) Outer Join (all rows from both)
+merged_outer <- merge(students1, students2, by = "ID", all = TRUE)
+print(merged_outer)
+
+🔹 Step 3: Append Datasets using bind_rows()
+install.packages("dplyr")   # only once
+library(dplyr)
+
+# Example of appending
+classA <- data.frame(Name = c("Asha", "Ravi"), Marks = c(85, 90))
+classB <- data.frame(Name = c("Neha", "Kiran"), Marks = c(88, 76))
+
+# Combine vertically
+all_students <- bind_rows(classA, classB)
+print(all_students)
+
+
+Practical No. 7
+
+Aim: Selecting and Dropping Variables using select() in R
+
+students <- data.frame(
+  ID = 1:6,
+  Name = c("Asha", "Ravi", "Neha", "Kiran", "Meena", "Raj"),
+  Age = c(20, 21, 19, 22, 20, 23),
+  Marks = c(85, 90, 88, 76, 92, 67),
+  Gender = c("F", "M", "F", "M", "F", "M")
+)
+print(students)
+
+🔹 Step 2: Load the dplyr Library
+
+install.packages("dplyr")  # Run once
+library(dplyr)
+selected_data <- select(students, Name, Marks)
+print(selected_data)
+dropped_data <- select(students, -Age)
+print(dropped_data)
+
+
+Practical No. 8
+
+Aim: Applying Basic Data Cleaning Functions: na.omit() and replace_na() in R
+
+students <- data.frame(
+  ID = 1:6,
+  Name = c("Asha", "Ravi", "Neha", "Kiran", "Meena", "Raj"),
+  Age = c(20, NA, 19, 22, NA, 23),
+  Marks = c(85, 90, NA, 76, 92, 67)
+)
+print(students)
+
+🔹 Step 2: Identify Missing Values
+is.na(students)
+
+🔹 Step 3: Remove Missing Values using na.omit()
+cleaned_data <- na.omit(students)
+print(cleaned_data)
+
+🔹 Step 4: Replace Missing Values using replace_na() (tidyr)
+install.packages("tidyr")   # Run once
+library(tidyr)
+students_replaced <- students %>%
+  replace_na(list(Age = 0, Marks = 0))
+print(students_replaced)
+
+Practical No. 9
+
+Aim: Performing Text Manipulation using str_sub() and str_split() in R
+
+install.packages("stringr")
+library(stringr)
+
+names <- c("Asha Patil", "Ravi Deshmukh", "Neha Joshi", "Kiran Mehta")
+print(names)
+
+first_part <- str_sub(names, 1, 4)
+print(first_part)
+
+last_part <- str_sub(names, -5, -1)
+print(last_part)
+
+str_sub(names, 1, 4) <- "Dr. "
+print(names)
+
+split_names <- str_split(names, " ")
+print(split_names)
+
+first_names <- sapply(str_split(names, " "), `[`, 1)
+print(first_names)
+last_names <- sapply(str_split(names, " "), `[`, 2)
+print(last_names)
+
+
+Practical No. 10
+
+Aim: Creating new variables using transformations and calculations
+
+students <- data.frame(
+  Name = c("Asha", "Ravi", "Neha", "Kiran", "Meena", "Raj"),
+  Marks1 = c(85, 90, 88, 76, 92, 67),
+  Marks2 = c(78, 95, 82, 80, 89, 70)
+)
+students$Total <- students$Marks1 + students$Marks2
+
+students$Average <- students$Total / 2
+students$Percent <- (students$Total / 200) * 100
+
+students$Grade <- ifelse(students$Percent >= 75, "Distinction",
+                  ifelse(students$Percent >= 60, "First Class",
+                  ifelse(students$Percent >= 50, "Second Class", "Fail")))
+print(students)
+
+
+Practical No. 11
+
+Aim: Reshaping data using pivot_longer() and pivot_wider() in R
+
+Install.packages(“tidyr”)
+library(tidyr)
+
+students <- data.frame(
+  Name = c("Asha", "Ravi", "Neha"),
+  Marks_Math = c(85, 90, 88),
+  Marks_Science = c(78, 95, 82)
+)
+
+long_data <- pivot_longer(
+  students,
+  cols = c(Marks_Math, Marks_Science),
+  names_to = "Subject",
+  values_to = "Marks"
+)
+
+wide_data <- pivot_wider(
+  long_data,
+  names_from = Subject,
+  values_from = Marks
+)
+
+print("Long Format:")
+print(long_data)
+
+print("Wide Format:")
+print(wide_data)
+
+
+Practical No. 12
+
+Aim: Combining datasets vertically using rbind()
+
+students1 <- data.frame(
+  Name = c("Asha", "Ravi"),
+  Marks = c(85, 90)
+)
+
+students2 <- data.frame(
+  Name = c("Neha", "Kiran"),
+  Marks = c(88, 76)
+)
+
+combined_data <- rbind(students1, students2)
+print(combined_data)
+
+
+Practical No. 13
+
+Aim: Identifying and handling duplicates using distinct() (R)
+
+install.packages(“dplyr”)
+library(dplyr)
+
+students <- data.frame(
+  Name  = c("Asha", "Ravi", "Neha", "Asha", "Ravi"),
+  Marks = c(85, 90, 88, 85, 90)
+)
+
+print("Original Data:")
+print(students)
+
+unique_data <- distinct(students)
+
+duplicate_rows <- students[duplicated(students), ]
+
+print("Duplicates Found:")
+print(duplicate_rows)
+
+print("Data After Removing Duplicates:")
+print(unique_data)
+
+
+Practical No. 14
+
+Aim: Extracting date components using lubridate  functions (R).
+
+Install.packages(“lubridate”)
+library(lubridate)
+
+data <- data.frame(
+  Person = c("Asha", "Ravi", "Neha"),
+  JoinDate = c("2023-05-15", "2022-11-03", "2024-01-20")
+)
+
+data$JoinDate <- ymd(data$JoinDate)
+
+data$Year  <- year(data$JoinDate)
+data$Month <- month(data$JoinDate)
+data$Day   <- day(data$JoinDate)
+data$Week  <- week(data$JoinDate)
+data$Wday  <- wday(data$JoinDate, label = TRUE)
+
+print(data)
+
+
+Practical No. 15
+
+Aim: Generating basic summaries using str() and summary()
+
+students <- data.frame(
+  Name  = c("Asha", "Ravi", "Neha", "Kiran"),
+  Age   = c(20, 21, 19, 22),
+  Marks = c(85, 90, 88, 76)
+)
+print("Structure of the dataset:")
+str(students)
+print("Summary of the dataset:")
+summary(students)
+
+
+Practical No. 16
+
+Aim: Generating descriptive statistics using summary() or describe() (R).
+
+head(mtcars)
+summary(mtcars)
+    
+2. Using describe() (psych package)
+
+install.packages("psych")
+library(psych)
+
+describe(mtcars)
+
+summary(mtcars$mpg)
+describe(mtcars$mpg)
+
+
+Practical No. 17
+
+Aim: Generating frequency tables using table() or count() (R).
+
+students <- data.frame(
+  Gender = c("Male", "Female", "Male", "Female", "Male", "Male", "Female"),
+  Grade  = c("A", "B", "A", "C", "B", "A", "A")
+)
+students
+table(students$Gender)
+table(students$Grade)
+prop.table(table(students$Grade)) * 100
+table(students$Gender, students$Grade)
+addmargins(table(students$Gender, students$Grade))
+
+ 2.Using dplyr::count() (Tidyverse Method)
+library(dplyr)
+students %>% count(Gender)
+students %>% count(Grade, sort = TRUE)
+students %>% 
+  count(Grade) %>% 
+  mutate(percentage = n / sum(n) * 100)
+students %>% count(Gender, Grade)
+as.data.frame(table(students$Gender, students$Grade))
+
+Practical No. 18
+
+Aim: Creating cross-tabulations and two-way tables using table() (R)
+
+students <- data.frame(
+  Gender = c("Male", "Female", "Male", "Female", "Male", "Female", "Male"),
+  Result = c("Pass", "Fail", "Pass", "Pass", "Fail", "Pass", "Pass")
+)
+students
+table(students$Gender, students$Result)
+addmargins(table(students$Gender, students$Result))
+prop.table(table(students$Gender, students$Result), 1) * 100
+prop.table(table(students$Gender, students$Result), 2) * 100
+crosstab_df <- as.data.frame(table(students$Gender, students$Result))
+crosstab_df
+
+
+
+Practical No. 19
+
+Aim: Performing one-sample t-tests using PROC TTEST (SAS), T-Test (SPSS), and t.test() (R).
+
+scores <- c(55, 60, 58, 62, 49, 53, 57, 61, 54, 59, 63, 60, 56, 52, 58)
+test_result <- t.test(scores, mu = 55)
+print(test_result)
+
+cat("Sample Mean:", test_result$estimate, "\n")
+cat("t-value:", test_result$statistic, "\n")
+cat("p-value:", test_result$p.value, "\n")
+cat("95% CI:", test_result$conf.int, "\n")
+
+
+Practical No. 20
+
+Aim: Performing independent two-sample t-tests using t.test() with grouping (R).
+
+data <- data.frame(
+  marks = c(78, 85, 90, 88, 76, 92, 81, 84),
+  gender = c("Male", "Male", "Male", "Male",
+             "Female", "Female", "Female", "Female")
+)
+t.test(marks ~ gender, data = data)
+
+Practical No. 21
+
+Aim: Performing paired t-tests using t.test(paired=TRUE) (R).
+
+before &lt;- c(45, 50, 55, 60, 65, 70)
+after &lt;- c(50, 55, 58, 65, 68, 75)
+t.test(before, after, paired = TRUE)
+
+Practical No. 22
+
+Aim: Performing two-way ANOVA using aov() (R).
+
+marks <- c(60, 62, 61,   70, 72, 71,   80, 82, 81)
+class <- factor(c("A","A","A", "B","B","B", "C","C","C"))
+
+result <- aov(marks ~ class)
+summary(result)
+
+
+Practical No. 23
+
+Aim: Performing two-way ANOVA using aov() (R).
+
+marks <- c(70, 72, 68, 71,   65, 67, 66, 64)
+method <- factor(c("Online","Online","Online","Online",
+                   "Offline","Offline","Offline","Offline"))
+gender <- factor(c("Male","Male","Female","Female",
+                   "Male","Male","Female","Female"))
+result <- aov(marks ~ method * gender)
+summary(result)
+
+
+Practical No. 24
+
+Aim: Conducting Chi-square tests using chisq.test() (R).
+
+education <- c("High", "High", "Low", "Medium", "Medium", "Low",
+               "High", "Low", "Medium", "High")
+employment <- c("Employed", "Unemployed", "Employed", "Employed",
+                "Unemployed", "Unemployed", "Employed", "Employed",
+                "Unemployed", "Unemployed")
+contingency_table <- table(education, employment)
+chi_result <- chisq.test(contingency_table)
+print(contingency_table)
+print(chi_result)
+print(chi_result$expected)
+
+
+Practical No. 25
+
+Aim: Creating graphical reports using ggplot2 in R.
+
+install.packages("ggplot2")
+library(ggplot2)
+data(mtcars)
+
+
+1. Scatter Plot (MPG vs HP)
+
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(color = "blue", size = 3) +
+  labs(
+    title = "Scatter Plot: MPG vs Horse Power",
+    x = "Horse Power",
+    y = "Miles Per Gallon"
+  ) +
+  theme_minimal()
+
+ 2. Bar Chart (Average MPG by Cylinders)
+
+ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+  stat_summary(fun = mean, geom = "bar", fill = "skyblue") +
+  labs(
+    title = "Bar Chart: Average MPG by Cylinders",
+    x = "Number of Cylinders",
+    y = "Average MPG"
+  ) +
+  theme_minimal()
+
+3. Line Graph (MPG Trend)
+
+ggplot(mtcars, aes(x = rownames(mtcars), y = mpg, group = 1)) +
+  geom_line(color = "red") +
+  geom_point() +
+  labs(
+    title = "Line Graph: MPG Trend",
+    x = "Car Models",
+    y = "Miles Per Gallon"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90))
+
+
+Practical No. 26
+
+Aim: Generating histograms and box plots using ggplot2 using R.
+
+install.packages("ggplot2")
+library(ggplot2)
+data(mtcars)
+
+1. Histogram of MPG
+
+ggplot(mtcars, aes(x = mpg)) +
+  geom_histogram(binwidth = 2, fill = "skyblue", color = "black") +
+  labs(
+    title = "Histogram of Miles Per Gallon (MPG)",
+    x = "Miles Per Gallon",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+
+2. Box Plot of MPG by Cylinders
+
+ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+  geom_boxplot(fill = "orange") +
+  labs(
+    title = "Box Plot of MPG by Cylinders",
+    x = "Number of Cylinders",
+    y = "Miles Per Gallon"
+  ) +
+  theme_minimal()
+
+
+Practical No. 27
+
+Aim: Generating correlation matrices using cor() (R).
+
+data <- data.frame(
+  Math = c(78, 85, 90, 88, 76),
+  Science = c(80, 82, 88, 90, 79),
+  English = c(75, 80, 85, 87, 78)
+)
+
+cor_matrix <- cor(data)
+
+print(cor_matrix)
+
+
+Practical No. 28
+
+Aim: Performing linear regression analysis using lm() (R).
+
+data <- data.frame(
+  Hours = c(2, 4, 6, 8, 10),
+  Marks = c(50, 55, 65, 70, 85)
+)
+
+model <- lm(Marks ~ Hours, data = data)
+summary(model)
+
+
+Practical No. 29
+
+Aim: Performing logistic regression using glm() (R).
+
+data <- data.frame(
+  Hours = c(1, 2, 3, 4, 5, 6),
+  Result = c(0, 0, 0, 1, 1, 1)   # 0 = Fail, 1 = Pass
+)
+
+model <- glm(Result ~ Hours, data = data, family = binomial)
+
+summary(model)
+
+
+Practical No. 30
+
+Aim: Exporting Results into External Files in R
+
+results <- data.frame(
+  Variable = c("Hours"),
+  Coefficient = c(5.2),
+  p_value = c(0.01)
+)
+write.csv(results, "results.csv", row.names = FALSE)
+
+install.packages("writexl")
+library(writexl)
+write_xlsx(results, "results.xlsx")
+
+pdf("results.pdf")
+print(results)
+dev.off()

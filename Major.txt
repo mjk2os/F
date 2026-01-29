@@ -1,0 +1,146 @@
+Practical No. 2
+Aim: GPIO – Light the LED (with and without Button)
+
+void setup() 
+{ 
+ pinMode(LED_BUILTIN, OUTPUT); 
+} 
+void loop() 
+{ 
+ digitalWrite(LED_BUILTIN, HIGH); 
+ delay(1000); // Wait for 1000 millisecond(s) 
+ digitalWrite(LED_BUILTIN, LOW); 
+ delay(1000); // Wait for 1000 millisecond(s) 
+}
+
+Practical No. 4
+Aim: 8x8 LED Grid Control (Matrix LED Programming)
+
+// ROW PINS
+#define R1 13
+#define R2 12
+#define R3 11
+#define R4 10
+#define R5 9
+#define R6 8
+#define R7 7
+#define R8 6
+
+// COLUMN PINS
+#define C1 5
+#define C2 4
+#define C3 3
+#define C4 2
+#define C5 A4
+#define C6 A3
+#define C7 A2
+#define C8 A1
+
+int rowPins[8] = {R1, R2, R3, R4, R5, R6, R7, R8};
+int colPins[8] = {C1, C2, C3, C4, C5, C6, C7, C8};
+
+void setup() {
+  for (int i = 0; i < 8; i++) {
+    pinMode(rowPins[i], OUTPUT);
+    digitalWrite(rowPins[i], HIGH);
+  }
+  for (int i = 0; i < 8; i++) {
+    pinMode(colPins[i], OUTPUT);
+    digitalWrite(colPins[i], LOW);
+  }
+}
+void loop() {
+  for (int r = 0; r < 8; r++) {
+    for (int c = 0; c < 8; c++) {
+      digitalWrite(colPins[c], HIGH);
+      digitalWrite(rowPins[r], LOW);
+
+      delay(100);
+      digitalWrite(rowPins[r], HIGH);
+      digitalWrite(colPins[c], LOW);
+
+      delay(50); 
+    }
+  }
+}
+
+Practical No. 5
+Aim: To control the motion of a Servo motor using Arduino
+
+#include <Servo.h>
+int pos = 0;
+Servo servo_9;
+void setup()
+{
+  servo_9.attach(9, 500, 2500);
+}
+void loop()
+{
+  for (pos = 0; pos <= 180; pos += 1) {
+    servo_9.write(pos);
+    delay(15);
+  }
+  for (pos = 180; pos >= 0; pos -= 1) {
+    servo_9.write(pos);
+    delay(15);
+  }
+}
+
+
+Practical No. 7
+Aim: Sensor Integration – Analog & Digital Sensors
+
+int LED = 13;
+const int gasThreshold = 310;
+int MQ2pin = A0;
+void setup() {
+  Serial.begin(9600);
+}
+void loop() {
+  float sensorValue = getSensorValue(MQ2pin);
+  Serial.print("Sensor Value: ");
+  Serial.println(sensorValue);
+  if (sensorValue >= gasThreshold) {
+    digitalWrite(LED, HIGH);
+    Serial.println("| SMOKE DETECTED");
+  } else {
+    digitalWrite(LED, LOW);
+  }
+  delay(1000);
+}
+float getSensorValue(int pin) {
+  return analogRead(pin);
+}
+
+
+Practical No. 8
+Aim: Web Trigger – Control GPIO from Web Server
+
+int ledPin = 13;
+String inputString = "";
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("Type LED ON or LED OFF (simulating WhatsApp message)");
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    inputString = Serial.readStringUntil('\n');
+    inputString.trim();
+    inputString.toUpperCase();
+
+    if (inputString == "LED ON") {
+      digitalWrite(ledPin, HIGH);
+      Serial.println("LED is ON (Message received)");
+    }
+    else if (inputString == "LED OFF") {
+      digitalWrite(ledPin, LOW);
+      Serial.println("LED is OFF (Message received)");
+    }
+    else {
+      Serial.println("Unknown command");
+    }
+  }
+}
