@@ -1,0 +1,91 @@
+Practical No. 2
+
+Aim: Use CryptTool to encrypt and decrypt passwords using
+RC4 algorithm.
+
+
+Practical No. 3
+
+Aim: Using Tracert, ping, ifconfig, netstat Command
+
+ping <ip>
+tracert <ip>
+netstat <ip>
+
+Practical No. 4
+
+Aim: Using Nmap scanner to perform port scanning of various
+forms – ACK, SYN, FIN,NULL, XMAS.
+
+Practical No. 6
+
+Aim: Create a simple key logger using python.
+
+Key_demo.py:
+
+import tkinter as tk
+def key_pressed(event):
+key = event.keysym
+label.config(text=f&quot;Key pressed:{key}&quot;)
+with open(&quot;keys_log.txt&quot;,&quot;a&quot;) as f:
+f.write(key + &quot;\n&quot;)
+root = tk.Tk()
+root.title(&quot;Keyboard Input Logger (Educational)&quot;)
+root.geometry(&quot;400x200&quot;)
+label = tk.Label(root,text=&quot;Press any key...&quot;, font = (&quot;Arial&quot;, 14))
+label.pack(pady = 40)
+root.bind(&quot;&lt;KeyPress&gt;&quot;, key_pressed)
+root.mainloop()
+
+cmd command :
+
+cd\
+cd Path where file is stored
+python key_demo.py
+
+Practical No. 7
+
+Aim: Use Wireshark Sniffer to Capture Network Traffic and Analyze.
+
+udp, dns, http, tcp, tcp.port = 80, icmp, Ip.addr = 
+
+Practical No. 8
+
+Aim: Perform ARP Poisoning in Window’s Command Prompt
+
+•	arp –a
+•	arp –g
+•	arp  -a –N 172.17.15.198
+•	arp –d*
+•	arp –d 172.17.15.198
+•	arp  -s <IP> <MAC>
+
+Practical No. 9
+
+Aim: Perform SQL Injection Attack.
+
+Copy the DVWA file from the Eh folder and copy it to the “C:\xampp\htdocs”.
+Open the “C:\xampp\htdocs\DVWA\config”.
+Rename the file config.inc with the extension “php”.
+Edit the config.inc file change the user_id to “root” and password keep it blank. Save the file and exit.
+Open Link: http://localhost/phpmyadmin  and create the database.
+Open Link: http://localhost/dvwa/setup.php and login with user_id: “admin” and password: “password”.
+
+DataBase: 
+
+create DATABASE student;
+use student;
+create table students( id INT PRIMARY KEY, name varchar(50), age INT);
+Insert INTO students ( id, name, age) VALUES (, , ,) , (, , ,) ;
+
+Practical No. 10: 
+
+Aim: Simulate the Cross Side Scripting Attack.
+
+
+Copy the DVWA file from the Eh folder and copy it to the “C:\xampp\htdocs”.
+Open the “C:\xampp\htdocs\DVWA\config”.
+Rename the file config.inc with the extension “php”.
+Edit the config.inc file change the user_id to “root” and password keep it blank. Save the file and exit.
+Open Link: http://localhost/phpmyadmin  and create the database.
+Open Link: http://localhost/dvwa/setup.php and login with user_id: “admin” and password: “password”.
