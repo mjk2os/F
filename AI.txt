@@ -1,0 +1,326 @@
+PRACTICAL NO.1(A)
+Aim: Implement the Breadth First Search algorithm to solve a given problem.
+
+Input:
+
+from collections import deque
+def bfs(graph, start):
+    visited = []
+    queue = deque([start])
+
+    while queue:
+        node = queue.popleft()
+        if node not in visited:
+            visited.append(node)
+            queue.extend(graph[node])
+    print("BFS Traversal:", visited)
+graph = {
+    'A' :['B','C'],
+    'B' :['D','E'],
+    'C' :['F'],
+    'D' :[],
+    'E' :['F'],
+    'F' :[]
+    }
+bfs(graph,'A')
+
+
+
+PRACTICAL NO.1(B)
+Aim: Implement the Iterative Depth First Search algorithm to solve the same problem.
+
+Input:
+from collections import deque
+def idfs(graph, start):
+    visited = []
+    stack = [start]
+
+    while stack:
+        node = stack.pop()
+        if node not in visited:
+            visited.append(node)
+            stack.extend(reversed(graph[node]))
+    print("IDFS Traversal:", visited)
+graph = {
+    'A' : ['B','C'],
+    'B' : ['D','E'],
+    'C' : ['F'],
+    'D' : ['G', 'H'],
+    'E' : ['F'],
+    'F' : [],
+    'G' : [],
+    'H' : []
+    }
+idfs(graph,'A')
+
+
+
+PRACTICAL NO.2(A)
+Aim: Implement the Breadth First Search algorithm to solve a given problem.
+
+Input:
+
+import heapq
+graph = {
+    'A':[('B',1), ('C',3)],
+    'B':[('G',1)],
+    'C':[('G',1)],
+    'G':[]
+    }
+
+h={
+    'A':2,
+    'B':1,
+    'C':2,
+    'G':0,
+    }
+
+def astar(start, goal):
+    pq=[]
+    heapq.heappush(pq, (h[start], 0, start, [start]))
+
+    while pq:
+        f,g,node,path = heapq.heappop(pq)
+
+        if node == goal:
+            print("A* Path:", path)
+            print("Total Cost:", g)
+            return
+        for neighbor, cost in graph[node]:
+            new_g = g + cost
+            new_f = new_g + h[neighbor]
+            heapq.heappush(pq,(new_f,new_g,neighbor,path + [neighbor]))
+astar('A','G')
+
+
+
+Practical No. 3
+Aim: Implement the Decision Tree Learning algorithm to build a decision tree for a given dataset. 
+Evaluate the accuracy and effectiveness of the decision tree on test data.
+Visualize and interpret the generated decision tree
+
+Code:
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+
+data = load_iris()
+X = data.data
+Y = data.target
+
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y,test_size=0.3, random_state = 1)
+model = DecisionTreeClassifier()
+model.fit(X_train, Y_train)
+Y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(Y_test, Y_pred))
+plot_tree(model, filled = True)
+plt.show()
+
+
+
+
+Practical No. 4
+Aim: Implement the Feed Forward Backpropagation algorithm to train a neural network. Use a given dataset to train the neural network for a specific task. 
+Evaluate the performance of the trained network on test data. 
+
+Code:
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score
+
+data = load_iris()
+X = data.data
+Y = data.target
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3, random_state = 1)
+model = MLPClassifier(max_iter=500)
+model.fit(X_train, Y_train)
+
+Y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(Y_test, Y_pred))
+
+
+
+
+Practical No. 5
+Aim: Implement the SVM algorithm for binary classification. 
+Train an SVM model using a given dataset and optimize its parameters. 
+Evaluate the performance of the SVM model on test data and analyze the results.
+
+Code:
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+
+data = load_iris()
+X = data.data
+Y = data.target
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3, random_state = 1)
+
+model = SVC(kernel = 'linear')
+model.fit(X_train, Y_train)
+
+Y_pred = model.predict(X_test)
+print("Accuracy:" , accuracy_score(Y_test, Y_pred))
+
+
+
+
+Practical No. 6
+Aim: Implement the Naive Bayes’ algorithm for classification.
+Train a Naive Bayes’ model using a given dataset and calculate class probabilities.
+Evaluate the accuracy of the model on test data and analyze the results.
+
+Code:
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+
+data=pd.read_csv("student_data.csv")
+print("Dataset")
+print(data)
+encoder = LabelEncoder()
+data['Study']= encoder.fit_transform(data['Study'])
+data['Attendance']= encoder.fit_transform(data['Attendance'])
+data['Result']= encoder.fit_transform(data['Result'])
+
+X = data[['Study','Attendance']]
+Y = data['Result']
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3, random_state = 42)
+
+model = GaussianNB()
+model.fit(X_train, Y_train)
+Y_pred = model.predict(X_test)
+print("\nActual Result")
+print(Y_test.values)
+
+print("\nPredicted Result")
+print(Y_pred)
+
+accuracy = accuracy_score(Y_test, Y_pred)
+print("\nAccuracy =", accuracy * 100, "%")
+
+
+Student_data.csv:
+Study  Attendence Result
+Yes     Good       Pass
+Yes     Good       Pass
+Yes     Average       Pass
+Yes     Poor       Fail
+No      Good       Fail
+No      Average    Fail
+No      Poor       Fail
+Yes     Good       Pass
+No      Poor       Fail
+Yes     Average    Pass 
+
+
+
+Practical No. 7
+Aim: Implement the K-NN algorithm for classification or regression.
+Apply the K-NN algorithm to a given dataset and predict the class or value for test data.
+Evaluate the accuracy or error of the predictions and analyze the results.
+
+Code:
+
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+data=pd.read_csv("student_data.csv")
+
+encoder = LabelEncoder()
+
+data['Study']= encoder.fit_transform(data['Study'])
+data['Attendance']= encoder.fit_transform(data['Attendance'])
+data['Result']= encoder.fit_transform(data['Result'])
+
+X = data[['Study','Attendance']]
+Y = data['Result']
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.3, random_state = 42)
+
+model=KNeighborsClassifier(n_neighbors = 3)
+
+model.fit(X_train, Y_train)
+Y_pred = model.predict(X_test)
+print("Actual:", Y_test.values)
+print("Predicted:", Y_pred)
+
+accuracy= accuracy_score(Y_test, Y_pred)
+print("Accuracy = ", accuracy * 100, "%")
+
+
+Student_data.csv:
+Study	Attendance	Result
+Yes	Good	        Pass
+Yes	Good	        Pass
+Yes	Average		Pass
+Yes	Poor		Fail
+No	Good		Fail
+No	Average		Fail
+No	Poor		Fail
+Yes	Good		Pass
+No	Poor		Fail
+Yes	Average		Pass
+
+
+
+
+
+Practical No. 8
+Aim: To implement the Apriori Algorithm for Association Rule Mining, find frequent itemsets, generate association rules, and calculate Support and Confidence.
+
+Code:
+
+import pandas as pd
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import apriori, association_rules
+
+transactions = [
+['Bread', 'Milk', 'Butter'],
+['Bread', 'Milk'],
+['Bread', 'Butter'],
+['Milk', 'Butter'],
+['Bread', 'Milk', 'Butter']
+]
+
+te = TransactionEncoder()
+te_array = te.fit(transactions).transform(transactions)
+df = pd.DataFrame(te_array, columns=te.columns_)
+print("Dataset")
+print(df)
+
+frequent_itemsets = apriori(df, min_support=0.4, use_colnames=True)
+print("\nFrequent Itemsets")
+print(frequent_itemsets)
+
+rules = association_rules(frequent_itemsets,
+
+metric="confidence",
+min_threshold=0.6)
+print("\nAssociation Rules")
+print(rules[['antecedents',
+'consequents',
+'support',
+'confidence']])
+
+
+Student_data.csv:
+Transaction	Item1	Item 2	Item 3
+T1	Bread	Milk	Butter
+T2	Bread	Milk	
+T3	Bread	Butter	
+T4	Milk	Butter	
+T5	Bread	Milk	Butter
