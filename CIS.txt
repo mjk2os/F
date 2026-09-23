@@ -1,0 +1,139 @@
+Practical No. 1
+Implementing Substitution and Transposition Ciphers
+Aim: Design and implement algorithms to encrypt and decrypt messages using classical substitution and transposition techniques.
+Input:
+
+def encrypt(text,s):
+    result = ""
+    for i in range(len(text)):
+        char = text[i]
+        if char.isupper():
+            result += chr((ord(char) + s - 65) % 26 + 65)
+        else:
+            result += chr((ord(char) + s - 97) % 26 + 97)
+    return result
+text = input("Enter the text to encrypt: ")
+s = 3
+
+print("Text: ", text)
+print("Cipher: ", encrypt(text,s))
+
+Practical No. 2
+RSA Encryption and Decryption
+Aim: Implement the RSA algorithm for public-key encryption and decryption, and explore its properties and security considerations.
+
+Input:
+
+import rsa
+publicKey, privateKey = rsa.newkeys(512)
+
+message = " Hello Manav"
+
+encMessage = rsa.encrypt(message.encode(),publicKey)
+
+print("OG String: ", message)
+print("Public Key: ", publicKey)
+print("Private Key: ", privateKey)
+print("Encrypted String: ", encMessage)
+
+decMessage = rsa.decrypt(encMessage, privateKey).decode()
+print("Decrypted String: " ,decMessage)
+
+
+Practical No. 3
+Message Authentication Codes
+Aim: Implement algorithms to generate and verify message authentication codes (MACs) for ensuring data integrity and authenticity.
+
+Input:
+
+import hmac
+import hashlib
+secret_key = b"TYCSA"
+
+message = b"HELLO TYCSA"
+
+mac = hmac.new(secret_key,message, hashlib.sha256)
+print("Original Message: ", message.decode())
+print("Generated MAC: ",mac.hexdigest())
+
+received_mac = mac.hexdigest()
+new_mac = hmac.new(secret_key, message, hashlib.sha256).hexdigest()
+
+if hmac.compare_digest(received_mac, new_mac):
+    print("MAC Verification Successful")
+    print("Message is Authentic and Not Modified")
+else:
+    print("MAC Verification Failed")
+    print("Message has been Modified")
+    
+
+Practical No. 04
+Digital Signature
+Aim: Implement digital signature algorithms such as RSA-based signatures, and verify the integrity and authenticity of digitally signed messages.
+
+Input:
+
+import rsa
+public_key, private_key = rsa.newkeys(512)
+message = input("Enter Message: ").encode()
+signature = rsa.sign(message,private_key, 'SHA-256')
+print("\nDigital Signature: ")
+print(signature)
+
+try:
+    rsa.verify(message, signature, public_key)
+    print("\nSignature Verified")
+    print("Message is Authentic")
+except:
+    print("Verification Failed")
+
+
+Practical No. 05
+Key Exchange using Diffie-Hellman
+Aim: Implement the Diffie-Hellman key exchange algorithm to securely exchange keys between two entities over an insecure network.
+
+
+Input:
+
+P = int(input("Enter Prime Number(P): "))
+G = int(input("Enter Primitive Root(G): "))
+
+a = int(input("Private Key of User A: "))
+b = int(input("Private Key of User B: "))
+
+A = pow(G, a, P)
+B = pow(G, b, P)
+
+print("\nPublic Key Of A =", A)
+print("Public Key Of B =", B)
+
+Ka = pow(B, a, P)
+Kb = pow(A, b, P)
+
+print("\nShared Secret at A =", Ka)
+print("Shared Secret at B =", Kb)
+
+if Ka == Kb:
+    print("\nKey Exchange Successful")
+else:
+    print("\nKey Exchange Failed")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
