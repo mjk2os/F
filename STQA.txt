@@ -1,0 +1,1635 @@
+Practical 1
+
+Aim: Creation of Test Suite Using Selenium IDE
+
+[add new test, name it like HTML test]
+[Paste website URL and start recording- https://example.com]
+[Stop recording and run current test]
+[Repeat of below also]
+
+Test Type          Website
+HTML 		https://example.com
+XML		https://www.w3schools.com/xml/note.xml
+JSON 		https://www.w3schools.com/js/js_json.asp
+Form 		https://www.selenium.dev/selenium/web/web-form.html
+
+
+
+Practical 2
+
+Aim: Cross-Website Functional Testing Using Selenium IDE
+
+A. Form_Functionality:
+
+Command                   Target                      					Value
+
+open			http://www.selenium.dev/selenuim/web/web-form-html
+execute script		document.querySelector('input[name="my-text"]')			Test
+execute script		document.querySelector('input[name="my-password"]')		12345
+select			name=my-select							label=Two
+click			css=button
+assert element present	css=body							Recevied
+
+
+B. Wikipedia_Functionality:
+
+Command                   Target                      							Value
+
+open			http://www.wikipedia.org
+click			id=js-link-box-en
+assert title		Wikipedia, the free encyclopedia
+execute script		document.querySelector('Input[name="search"]').value='Selenium(software)'	Selenium(software)
+click			css=button[type="submit"]
+assert text		css=h1										Selenium(software)
+
+C. Test Suites:
+
+Command                   Target                      					Value
+
+open			http://www.selenium.dev/selenuim/web/web-form-html
+execute script		document.querySelector('input[name="my-text"]')			Test
+execute script		document.querySelector('input[name="my-password"]')		12345
+select			name=my-select							label=Two
+click			css=button
+assert element present	css=body							Recevied
+
+Practical 4
+
+Aim: Selenium Server (Grid) Configuration and Remote Execution
+
+Step1: Download jar file from   https://www.selenium.dev/downloads/  →previous release →release→ selenium 4.45.0 jar.
+
+Step2: Move jar in selenium folder
+
+Step3: On command prompt run following commands
+1. cd C:\Selenium/
+2. Use this command to run selenium
+       java -jar selenium-server-4.45.0.jar standalone
+Step 4: Go to http://localhost:4444
+
+ChromeGridTest.java:
+
+package org.example;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import java.net.URL;
+public class ChromeGridTest {
+    public static void main(String[] args) {
+        try {
+            ChromeOptions options = new ChromeOptions();
+            WebDriver driver = new RemoteWebDriver(
+                    new URL("http://localhost:4444"),
+                    options);
+            driver.get("https://www.google.com");
+            System.out.println("Page Title : " + driver.getTitle());
+            System.out.println("Current URL : " + driver.getCurrentUrl());
+            Thread.sleep(3000);
+            driver.quit();
+            System.out.println("Test Executed Successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>SeleniumGridDemo</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>26</maven.compiler.source>
+        <maven.compiler.target>26</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.45.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+		
+	
+Practical 5
+
+Aim: Login Automation and Validation.
+
+LoginTest.java:
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+public class LoginTest {
+    public static void main(String[] args) throws InterruptedException {
+        // Setup ChromeDriver automatically
+        WebDriverManager.chromedriver().setup();
+        // Open Chrome
+        WebDriver driver = new ChromeDriver();
+        // Maximize window
+        driver.manage().window().maximize();
+        // Open website
+        driver.get("https://the-internet.herokuapp.com/login");
+        // Enter username
+        driver.findElement(By.id("username")).sendKeys("tomsmith");
+        // Enter password
+        driver.findElement(By.id("password")).sendKeys("SuperSecretPassword!");
+        // Click Login
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        // Wait for 2 seconds
+        Thread.sleep(2000);
+        // Verify Login
+        String message = driver.findElement(By.id("flash")).getText();
+        if(message.contains("You logged into a secure area!"))
+        {
+            System.out.println("Login Successful");
+        }
+        else
+        {
+            System.out.println("Login Failed"); 
+  }
+        // Close browser
+        driver.quit();
+    }
+}
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+        https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.demo</groupId>
+    <artifactId>SeleniumLoginDemo</artifactId>
+    <version>1.0</version>
+    <dependencies>
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.22.0</version>
+        </dependency>
+        <!-- WebDriver Manager -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>6.1.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+
+
+Practical 6
+
+Aim: Web Element Interaction and Synchronization Handling.
+
+WebElementDemo.java:
+
+package org.example;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
+
+public class WebElementDemo {
+
+    public static void main(String[] args) {
+        WebDriverManager.chromedriver().setup();
+        WebDriver driver = new ChromeDriver();
+
+        // Implicit Wait
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().window().maximize();
+
+        // Open Demo Website
+        driver.get("https://demoqa.com/automation-practice-form");
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        // Textbox
+        driver.findElement(By.id("firstName")).sendKeys("Manav");
+        driver.findElement(By.id("lastName")).sendKeys("Pawar");
+        driver.findElement(By.id("userEmail")).sendKeys("manavpawar287@gmail.com");
+
+        // Radio Button
+        WebElement male =
+                driver.findElement(By.xpath("//label[text()='male']"));
+        wait.until(ExpectedConditions.elementToBeClickable(male));
+        male.click();
+
+        // Mobile Number
+        driver.findElement(By.id("userNumber"))
+                .sendKeys("8600392378");
+
+        // Checkbox
+        WebElement sports =
+                driver.findElement(By.xpath("//label[text()='Sports']"));
+        wait.until(ExpectedConditions.elementToBeClickable(sports));
+        sports.click();
+
+        // Dropdown
+        WebElement state =
+                driver.findElement(By.id("react-select-3-input"));
+        state.sendKeys("NCR");
+        state.sendKeys(Keys.ENTER);
+
+        // Explicit Wait Example
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.id("submit")));
+        driver.findElement(By.id("submit")).click();
+        System.out.println("Form Submitted Successfully");
+        driver.quit();
+    }
+}
+
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+        http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.demo</groupId>
+    <artifactId>WebElementInteraction</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+        <!-- WebDriver Manager -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>6.1.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+
+ForAlert.java:
+
+package org.example;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.time.Duration;
+
+public class ForAlert {
+
+    public static void main(String[] args) throws InterruptedException {
+        WebDriverManager.chromedriver().setup();
+        WebDriver driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().window().maximize();
+        
+        // -----------------------------
+        // Alert Example
+        // -----------------------------
+
+        driver.get("https://demoqa.com/alerts");
+        driver.findElement(By.id("alertButton")).click();
+        Alert alert = driver.switchTo().alert();
+        System.out.println(alert.getText());
+        alert.accept();
+
+        // -----------------------------
+        // Frame Example
+        // -----------------------------
+
+        driver.get("https://demoqa.com/frames");
+        driver.switchTo().frame("frame1");
+        System.out.println(driver.findElement(By.id("sampleHeading")).getText());
+        driver.switchTo().defaultContent();
+        driver.quit();
+    }
+}
+
+
+Practical 7
+
+Aim: Data-Driven Testing Using Excel Integration
+
+StudentDataDriven.java:
+
+package org.example;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.io.*;
+
+public class StudentDataDriven {
+    public static void main(String[] args) throws Exception {
+        Workbook wb = new XSSFWorkbook(new FileInputStream("students.xlsx"));
+        Sheet sheet = wb.getSheetAt(0);
+        WebDriverManager.chromedriver().setup();
+        WebDriver driver = new ChromeDriver();
+        String path = new File("student.html").getAbsolutePath();
+        driver.get("file:///" + path.replace("\\", "/"));
+        for (int i = 1; i <= 5; i++) {
+            Row row = sheet.getRow(i);
+            driver.findElement(By.id("roll")).clear();
+            driver.findElement(By.id("name")).clear();
+            driver.findElement(By.id("email")).clear();
+            driver.findElement(By.id("roll")).sendKeys(row.getCell(0).toString());
+            driver.findElement(By.id("name")).sendKeys(row.getCell(1).toString());
+            driver.findElement(By.id("email")).sendKeys(row.getCell(2).toString());
+            driver.findElement(By.id("submit")).click();
+            String msg = driver.findElement(By.id("msg")).getText();
+            row.createCell(3).setCellValue(msg.equals("Record Updated") ? "PASS" : "FAIL");
+        }
+        FileOutputStream out = new FileOutputStream("students.xlsx");
+        wb.write(out);
+        out.close();
+        wb.close();
+        driver.quit();
+        System.out.println("Data Updated Successfully.");
+    }
+}
+
+pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+        https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tybsc</groupId>
+    <artifactId>DataDrivenTesting</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <!-- Selenium WebDriver -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+        <!-- Apache POI -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.4.1</version>
+        </dependency>
+
+        <!-- WebDriverManager -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>6.1.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+Create a student.html in Practical folder not in sub folder
+student.html:
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Form</title>
+</head>
+<body>
+
+Roll No: <input type="text" id="roll"><br><br>
+Name: <input type="text" id="name"><br><br>
+Email: <input type="text" id="email"><br><br>
+<button id="submit" onclick="save()">Submit</button>
+<p id="msg"></p>
+
+<script>
+  function save(){
+  document.getElementById("msg").innerHTML="Record Updated";
+  }
+</script>
+</body>
+</html>
+
+Create a Students.xlsx file and save as shown below:
+C:\Users\student\IdeaProjects\Practical7\Students.xlsx
+
+Roll No   Name    Email                Status
+101       Amit    amit@gmail.com       PASS
+102       Neha    neha@gmail.com       PASS
+103       Rahul   rahul@gmail.com      PASS
+104       Sneha   sneha@gmail.com      PASS
+105       Priya   priya@gmail.com      PASS
+
+
+
+
+Practical 8
+Aim: Data Extraction and Score Analysis from Web Table.
+
+WebTableAnalysis.java:
+
+package org.example;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.io.File;
+import java.util.List;
+
+public class WebTableAnalysis {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("file:///C:/Users/student/IdeaProjects/Practical8/studentMarks.html");
+        List<WebElement> rows =
+                driver.findElements(By.xpath("//table[@id='marks']//tr"));
+        int count = 0;
+        for (int i = 1; i < rows.size(); i++) {
+
+            List<WebElement> cells =
+                    rows.get(i).findElements(By.tagName("td"));
+            int math = Integer.parseInt(cells.get(1).getText());
+            int science = Integer.parseInt(cells.get(2).getText());
+            int english = Integer.parseInt(cells.get(3).getText());
+            if (math > 60 || science > 60 || english > 60) {
+                count++;
+            }
+        }
+
+        int total = rows.size() - 1;
+        double percentage = (count * 100.0) / total;
+        System.out.println("Total Students : " + total);
+        System.out.println("Above 60 in at least one subject : " + count);
+        System.out.printf("Percentage : %.2f%%", percentage);
+        System.out.println("Rows found = " + rows.size());
+
+    }
+}
+
+
+pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>WebTableAnalysis</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.24.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+
+studentMarks.html:
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Marks</title>
+</head>
+<body>
+<h2>Student Marks Table</h2>
+<table border="1" id="marks">
+    <tr>
+        <th>Name</th>
+        <th>Math</th>
+        <th>Science</th>
+        <th>English</th>
+    </tr>
+
+    <tr>
+        <td>Amit</td>
+        <td>75</td>
+        <td>55</td>
+        <td>68</td>
+    </tr>
+
+    <tr>
+        <td>Neha</td>
+        <td>45</td>
+        <td>52</td>
+        <td>58</td>
+    </tr>
+
+    <tr>
+        <td>Riya</td>
+        <td>80</td>
+        <td>90</td>
+        <td>85</td>
+    </tr>
+
+    <tr>
+        <td>Karan</td>
+        <td>60</td>
+        <td>62</td>
+        <td>50</td>
+    </tr>
+
+    <tr>
+        <td>Priya</td>
+        <td>40</td>
+        <td>48</td>
+        <td>35</td>
+    </tr>
+</table>
+</body>
+</html>
+
+
+Practical 9
+Aim: Object Identification and Counting on Web Page.
+
+pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>ObjectCounter</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+
+ObjectCounter.java:
+
+package org.example;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.util.List;
+public class ObjectCounter {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://www.geeksforgeeks.org/java/java/");
+        driver.manage().window().maximize();
+        List<WebElement> links = driver.findElements(By.tagName("a"));
+        List<WebElement> images = driver.findElements(By.tagName("img"));
+        List<WebElement> buttons = driver.findElements(By.tagName("button"));
+        List<WebElement> inputs = driver.findElements(By.tagName("input"));
+        System.out.println("===== Object Count =====");
+        System.out.println("Links      : " + links.size());
+        System.out.println("Images     : " + images.size());
+        System.out.println("Buttons    : " + buttons.size());
+        System.out.println("Input Tags : " + inputs.size());
+
+        int total = links.size() + images.size() + buttons.size() + inputs.size();
+        System.out.println("------------------------");
+        System.out.println("Total Objects : " + total);
+        //driver.quit();
+    }
+}
+
+
+Practical 10
+Aim:List and Combo Box Item Verification
+ 
+pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>DropdownVerification</artifactId>
+    <version>1.0</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+
+DropdownVerification.java:
+
+package org.example;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.Select;
+import java.util.List;
+public class DropdownVerification {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+
+        driver.get("https://the-internet.herokuapp.com/dropdown");
+        driver.manage().window().maximize();
+
+        WebElement dropdown = driver.findElement(By.id("dropdown"));
+
+        Select select = new Select(dropdown);
+
+        List<WebElement> items = select.getOptions();
+
+        System.out.println("Total Items : " + items.size());
+
+        System.out.println("\nDropdown Items:");
+
+        for (WebElement item : items) {
+            System.out.println(item.getText());
+        }
+
+        System.out.println("\nDefault Selected Item : "
+                + select.getFirstSelectedOption().getText());
+
+        select.selectByVisibleText("Option 1");
+
+        System.out.println("Selected Item : "
+                + select.getFirstSelectedOption().getText());
+
+        select.selectByVisibleText("Option 2");
+
+        System.out.println("New Selected Item : "
+                + select.getFirstSelectedOption().getText());
+
+        // driver.quit();
+    }
+}
+
+
+Practical 11
+Aim:Checkbox Identification and Validation
+
+pom.xml:
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>CheckboxValidation</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+
+CheckboxValidation.java:
+
+package org.example;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.util.List;
+
+public class CheckboxValidation {
+
+    public static void main(String[] args) {
+
+        WebDriver driver = new ChromeDriver();
+
+        driver.get("https://the-internet.herokuapp.com/checkboxes");
+        driver.manage().window().maximize();
+
+        List<WebElement> checkboxes =
+                driver.findElements(By.cssSelector("input[type='checkbox']"));
+
+        int checked = 0;
+        int unchecked = 0;
+
+        for (WebElement checkbox : checkboxes) {
+
+            if (checkbox.isSelected())
+                checked++;
+            else
+                unchecked++;
+        }
+
+        System.out.println("Total Checkboxes : " + checkboxes.size());
+        System.out.println("Checked          : " + checked);
+        System.out.println("Unchecked        : " + unchecked);
+
+        System.out.println("\nSelecting all unchecked checkboxes...");
+
+        for (WebElement checkbox : checkboxes) {
+
+            if (!checkbox.isSelected()) {
+                checkbox.click();
+            }
+        }
+        boolean allSelected = true;
+
+        for (WebElement checkbox : checkboxes) {
+
+            if (!checkbox.isSelected()) {
+                allSelected = false;
+                break;
+            }
+        }
+
+        if (allSelected)
+            System.out.println("Validation Passed: All checkboxes are selected.");
+        else
+            System.out.println("Validation Failed.");
+
+        driver.quit();
+    }
+}
+
+
+Practical No. 12
+
+Aim: Dynamic Web Table Handling and Sorting Validation
+
+pom.xml:
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>WebTableHandling</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+
+
+WebTableHandling.java:
+
+package org.example;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class WebTableHandling {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://the-internet.herokuapp.com/tables");
+        driver.manage().window().maximize();
+
+        List<WebElement> rows = driver.findElements(
+                By.xpath("//table[@id='table1']/tbody/tr/td[1]"));
+
+        System.out.println("Last Names in Table:");
+
+        List<String> names = new ArrayList<>();
+
+        for (WebElement row : rows) {
+            System.out.println(row.getText());
+            names.add(row.getText());
+        }
+
+        driver.findElement(
+                        By.xpath("//table[@id='table1']//span[text()='Last Name']"))
+                .click();
+
+        List<WebElement> sortedRows = driver.findElements(
+                By.xpath("//table[@id='table1']/tbody/tr/td[1]"));
+
+        List<String> actual = new ArrayList<>();
+
+        for (WebElement row : sortedRows) {
+            actual.add(row.getText());
+        }
+
+        List<String> expected = new ArrayList<>(actual);
+        Collections.sort(expected);
+
+        if (actual.equals(expected))
+            System.out.println("\nSorting Validation : Passed");
+        else
+            System.out.println("\nSorting Validation : Failed");
+
+        System.out.println("\nNames containing 'B':");
+
+        for (String name : actual) {
+            if (name.startsWith("B")) {
+                System.out.println(name);
+            }
+        }
+        Thread.sleep(5000);
+        driver.quit();
+    }
+}
+
+
+Practical 13
+Aim: File Upload and Download Automation
+
+Create one pdf file and store it in one folder
+For example, location used in below upload file as-  “D:\\STQA\\Sample.pdf"
+
+FileDownload.java:
+
+package org.example;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.io.File;
+import java.time.Duration;
+
+public class FileDownload {
+
+    public static void main(String[] args) throws Exception {
+        WebDriver driver = new ChromeDriver();
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        driver.get("https://the-internet.herokuapp.com/download");
+        driver.findElement(By.cssSelector("div.example a")).click();
+        System.out.println("Downloading file...");
+        Thread.sleep(5000);
+
+        String fileName = driver.findElement(By.cssSelector("div.example a")).getText();
+
+        String downloadPath = System.getProperty("user.home")
+                + "\\Downloads\\" + fileName;
+
+        File file = new File(downloadPath);
+
+        if (file.exists()) {
+            System.out.println("Download Successful");
+            System.out.println("File Name : " + fileName);
+            System.out.println("Location  : " + file.getAbsolutePath());
+        } else {
+            System.out.println("Download Failed");
+        }
+        driver.quit();
+    }
+}
+
+
+FileUploadRobot.java:
+
+package org.example;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
+import java.time.Duration;
+
+public class FileUploadRobot {
+
+    public static void main(String[] args) throws Exception {
+
+        WebDriver driver = new ChromeDriver();
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        driver.get("https://www.ilovepdf.com/pdf_to_word");
+        Thread.sleep(3000);
+        WebElement button = driver.findElement(By.id("pickfiles"));
+
+        button.click();
+        Thread.sleep(3000);
+        StringSelection file =
+                new StringSelection("D:\\STQA\\Sample.pdf");
+
+        Toolkit.getDefaultToolkit()
+                .getSystemClipboard()
+                .setContents(file, null);
+
+        Robot robot = new Robot();
+
+        robot.delay(1000);
+
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        robot.keyPress(KeyEvent.VK_V);
+        robot.keyRelease(KeyEvent.VK_V);
+        robot.keyRelease(KeyEvent.VK_CONTROL);
+
+        robot.delay(1000);
+
+        robot.keyPress(KeyEvent.VK_ENTER);
+        robot.keyRelease(KeyEvent.VK_ENTER);
+        System.out.println("File selected successfully.");
+        Thread.sleep(8000);
+
+        driver.quit();
+    }
+}
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.demo</groupId>
+    <artifactId>FileAutomation</artifactId>
+    <version>1.0</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+
+    </dependencies>
+</project>
+
+
+Practical 14
+Aim: Screenshot Capture and Logging Mechanism.
+Tool: Selenium WebDriver + Log4j
+Implement screenshot capture on test failure and integrate logging mechanism using
+Log4j. Generate execution logs and analyze error messages.
+
+
+ScreenshotLogDemo.java:
+
+package org.example;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.io.File;
+import java.time.Duration;
+public class ScreenshotLogDemo {
+
+    static Logger log =
+            LogManager.getLogger(ScreenshotLogDemo.class);
+    public static void main(String[] args) {
+
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts()
+                .implicitlyWait(Duration.ofSeconds(10));
+
+        try {
+            log.info("Browser Started");
+            driver.get("https://www.google.com");
+            log.info("Google Opened");
+
+            // Intentionally incorrect locator to generate an error
+            driver.findElement(By.id("wrong_id"));
+            log.info("Element Found");
+        }
+
+        catch(Exception e){
+            log.error("Test Failed");
+            log.error(e.getMessage());
+            takeScreenshot(driver);
+        }
+
+        finally {
+            driver.quit();
+            log.info("Browser Closed");
+        }
+    }
+
+    public static void takeScreenshot(WebDriver driver){
+        try{
+            TakesScreenshot ts =
+                    (TakesScreenshot) driver;
+            File source =
+                    ts.getScreenshotAs(OutputType.FILE);
+
+//CREATE THE FOLDER IN SYSTEM OR GIVE THE PATH TO WHICH SCREENSHOT TO BE SAVED
+            File destination =
+                    new File("D:\\STQA\\screenshots\\Pract14.png");
+
+            FileUtils.copyFile(source,destination);
+            log.info("Screenshot Saved");
+        }
+        catch(Exception ex){
+            log.error(ex.getMessage());
+        }
+    }
+}
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.demo</groupId>
+    <artifactId>ScreenshotLogging</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>26</maven.compiler.source>
+        <maven.compiler.target>26</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+
+        <!-- Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.25.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.25.1</version>
+        </dependency>
+        <!-- Commons IO -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.18.0</version>
+        </dependency>
+    </dependencies>
+</project>
+
+C:\Users\student\IdeaProjects\practical14\src\main\log4j2.xml
+Log4j2.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console">
+            <PatternLayout pattern="%d [%p] %m%n"/>
+        </Console>
+        <File name="FileLogger"
+              fileName="logs/execution.log">
+            <PatternLayout
+                    pattern="%d %-5p %c - %m%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+
+Practical 15
+Aim:Page Object Model (POM) Framework Implementation.
+
+src\main\java\pages\LoginPage.java:
+
+package pages;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+public class LoginPage {
+    WebDriver driver;
+    By username = By.id("username");
+    By password = By.id("password");
+    By loginButton = By.id("submit");
+
+    public LoginPage(WebDriver driver) {
+        this.driver = driver;
+    }
+    public void enterUsername(String user) {
+        driver.findElement(username).sendKeys(user);
+    }
+    public void enterPassword(String pass) {
+        driver.findElement(password).sendKeys(pass);
+    }
+    public void clickLogin() {
+        driver.findElement(loginButton).click();
+    }
+}
+
+src\main\java\base\BaseClass.java:
+
+package base;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+public class BaseClass {
+    public static WebDriver driver;
+    public void setup() {
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://practicetestautomation.com/practice-test-login/");
+    }
+    public void closeBrowser() {
+        driver.quit();
+    } }
+
+
+src\test\java\test\LoginTest.java:
+
+package tests;
+
+import base.BaseClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import pages.LoginPage;
+
+public class LoginTest extends BaseClass {
+    LoginPage login;
+    @BeforeMethod
+    public void openBrowser() {
+        setup();
+        login = new LoginPage(driver);
+    }
+
+    @Test
+    public void LoginTestCase() {
+        login.enterUsername("student");
+        login.enterPassword("Password123");
+        login.clickLogin();
+        System.out.println("Login Successful");
+    }
+
+    @AfterMethod
+    public void close() {
+        closeBrowser();
+    }
+ }
+
+
+Testng.xml:
+
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="POM Suite">
+    <test name="Login Test">
+        <classes>
+            <class name="tests.LoginTest"/>
+        </classes>
+    </test>
+</suite>
+
+
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>POMFramework</artifactId>
+    <version>1.0</version>
+    <dependencies>
+
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.11.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+
+Practical 16
+Aim: TestNG Framework Implementation and Reporting.
+
+TestNGDemo.java:
+
+package org.example;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
+import org.testng.annotations.*;
+
+public class TestNGDemo {
+
+    WebDriver driver;
+    @BeforeClass
+    public void setup() {
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+    }
+    @Test(priority = 1, groups = "Smoke")
+    public void googleTitle() {
+        driver.get("https://www.google.com");
+
+        Assert.assertTrue(driver.getTitle().contains("Google"));
+    }
+    @Test(priority = 2, groups = "Regression")
+    public void googleURL() {
+        driver.get("https://www.google.com");
+        Assert.assertTrue(driver.getCurrentUrl().contains("google"));
+    }
+    @AfterClass
+    public void closeBrowser() {
+        //driver.quit();
+    }
+}
+
+
+Testng.xml:
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="AutomationSuite">
+    <test name="SmokeTests">
+        <groups>
+            <run>
+                <include name="Smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="org.example.TestNGDemo"/>
+        </classes>
+    </test>
+</suite>
+
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.demo</groupId>
+    <artifactId>TestNGFramework</artifactId>
+    <version>1.0</version>
+    <dependencies>
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.11.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+
+Practical No. 17
+
+Aim: Continuous Integration using Jenkins
+
+LoginTest.java:
+
+package org.example;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.Test;
+public class LoginTest {
+    @Test
+    public void openGoogle() {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://www.google.com");
+        System.out.println("Google Opened Successfully");
+        driver.quit();
+    }
+}
+
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>SeleniumJenkinsProject</artifactId>
+    <version>1.0</version>
+
+    <dependencies>
+        <!-- Selenium -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.35.0</version>
+        </dependency>
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.11.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.11.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.3</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+Testng.xml:
+
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="AutomationSuite">
+    <test name="Google Test">
+        <classes>
+            <class name="org.example.LoginTest"/>
+        </classes>
+    </test>
+</suite>
+
+
+Practical 18
+Aim:Cross-Browser Testing Using Selenium Grid 3.
+
+
+Step1-Create a folder:  C:\Selenium
+Step2-Download jar file from   https://www.selenium.dev/downloads/  →previous release →release→ selenium 4.45.0 jar
+Step3-Move jar in selenium folder
+Step4-On command prompt run following commands
+1. cd C:\Selenium/
+2. Use this command to run selenium
+       java -jar selenium-server-4.45.0.jar standalone
+Step5-Go to http://localhost:4444
+Keep this on→
+
+Create a folder test in java folder and then save below file.
+LoginTest.java:
+
+package tests;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+public class LoginTest extends BaseTest {
+    @Test
+    public void verifyTitle() {
+        long start = System.currentTimeMillis();
+        driver.get("https://the-internet.herokuapp.com/login");
+        String title = driver.getTitle();
+        Assert.assertEquals(title, "The Internet");
+        long end = System.currentTimeMillis();
+        System.out.println("--------------------------------");
+        System.out.println("Browser Execution Time : "
+                + (end-start)+" ms");
+        System.out.println("--------------------------------");
+    }
+}
+
+
+BaseTest.java:
+
+package tests;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.annotations.*;
+import java.net.URL;
+
+public class BaseTest {
+    WebDriver driver;
+    @Parameters("browser")
+    @BeforeMethod
+    public void setup(String browser) throws Exception {
+        if(browser.equalsIgnoreCase("chrome")) {
+            driver = new RemoteWebDriver(
+                    new URL("http://localhost:4444"),
+                    new ChromeOptions());
+        }
+
+        else if(browser.equalsIgnoreCase("firefox")) {
+            driver = new RemoteWebDriver(
+                    new URL("http://localhost:4444"),
+                    new FirefoxOptions());
+        }
+        else if(browser.equalsIgnoreCase("edge")) {
+            driver = new RemoteWebDriver(
+                    new URL("http://localhost:4444"),
+                    new EdgeOptions());
+        }
+        driver.manage().window().maximize();
+    }
+    @AfterMethod
+    public void tearDown() {
+        // driver.quit();
+    }
+}
+
+Pom.xml:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <artifactId>CrossBrowserGrid</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.34.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.11.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+
+Testng.xml:
+
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="CrossBrowserSuite" parallel="tests" thread-count="3">
+    <test name="Chrome Test">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <test name="Firefox Test">
+        <parameter name="browser" value="firefox"/>
+        <classes>
+            <class name="tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <test name="Edge Test">
+        <parameter name="browser" value="edge"/>
+        <classes>
+            <class name="tests.LoginTest"/>
+        </classes>
+    </test>
+</suite>
+
+
+
+practical̥ 19
+Aim: Load Testing Using Apache JMeter
+
+Step 1: Download apache-jmeter.5.6.3.zip
+Step 2: Extract the zip file.
+Step 3: Copy the folder in “D – Drive”.
+Step 4: Open the Apache – Jmeter.
+Step 5: Create a Test Plan.
+
+Step 6: Add Thread Group:
+Testplan\add\Threads\Thread group
+
+Name - Thread Group
+action- continue
+no. of threads - 1
+Ramp - 2 
+loop count 1 [dont click infinity]
+same useron each iteration 
+
+
+
+Step 7: Add HTTP Request:
+Thread Group\add\sampler\HTTP request
+
+Protocol- https
+Server Name Or IP- www.geeksforgeeks.org
+path- /
+
+
+Step 8: Add listner
+Thread Group/Add/Listner/View result in table
+Thread Group/Add/Listner/summary
+Thread Group/Add/Listner/Graph
+Thread Group/Add/Listner/Aggregate
