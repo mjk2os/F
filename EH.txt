@@ -16,6 +16,12 @@ Practical No. 4
 
 Aim: Using Nmap scanner to perform port scanning of various
 forms – ACK, SYN, FIN,NULL, XMAS.
+Comman target <Ip address>
+ACK: nmap -sA -T4 <IP>
+SYN: namp -p 22,113,139 <IP>
+FIN: nmap -sF -T4 <IP>
+NULL: nmap -sN -p 22 <ip>
+XMAS: nmap -sX -T4 <ip>
 
 Practical No. 6
 
@@ -26,15 +32,15 @@ Key_demo.py:
 import tkinter as tk
 def key_pressed(event):
 key = event.keysym
-label.config(text=f&quot;Key pressed:{key}&quot;)
-with open(&quot;keys_log.txt&quot;,&quot;a&quot;) as f:
-f.write(key + &quot;\n&quot;)
+label.config(text=f"Key pressed:{key}")
+with open("keys_log.txt","a") as f:
+f.write(key + "\n")
 root = tk.Tk()
-root.title(&quot;Keyboard Input Logger (Educational)&quot;)
-root.geometry(&quot;400x200&quot;)
-label = tk.Label(root,text=&quot;Press any key...&quot;, font = (&quot;Arial&quot;, 14))
+root.title("Keyboard Input Logger (Educational)&quot;)
+root.geometry("400x200")
+label = tk.Label(root,text="Press any key...", font = ("Arial", 14))
 label.pack(pady = 40)
-root.bind(&quot;&lt;KeyPress&gt;&quot;, key_pressed)
+root.bind("<KeyPress>", key_pressed)
 root.mainloop()
 
 cmd command :
